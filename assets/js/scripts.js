@@ -1,15 +1,3 @@
-/*-----------------------------------------------------------------------------------
-
-    Theme Name: Gavi
-    Theme URI: http://
-    Description: Creative Personal & Portfolio
-    Author: UI-ThemeZ
-    Author URI: http://themeforest.net/user/UI-ThemeZ
-    Version: 1.0
-
------------------------------------------------------------------------------------*/
-
-
 $(function () {
 
     "use strict";

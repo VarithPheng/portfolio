@@ -62,6 +62,17 @@
   list-style: none;
 }
 
+.icon-img-container {
+  width: 100px; /* Adjust the width of the container as needed */
+  height: 100px; /* Adjust the height of the container as needed */
+  margin-bottom: 30px; /* Adjust margin-bottom as needed */
+  display: flex;
+  justify-content: center; /* Center the content horizontally */
+  align-items: center; /* Center the content vertically */
+}
+
+
+
 body {
   color: #fff;
   background-color: #1d1d1d;
