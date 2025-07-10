@@ -172,9 +172,6 @@ export default function Portfolio() {
                   </motion.span>
                 </div>
               </div>
-              <div className="text-xs text-gray-500 mt-1 ml-12">
-                Full-Stack Engineer | System Architect
-              </div>
             </motion.div>
 
             {/* Navigation Menu */}
