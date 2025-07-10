@@ -13,6 +13,8 @@ import {
   Terminal,
   Code2,
   Coffee,
+  Menu,
+  X,
 } from "lucide-react";
 import { Icon } from "@iconify/react";
 import { Marquee } from "@/components/magicui/marquee";
@@ -23,6 +25,7 @@ export default function Portfolio() {
   const [currentTime, setCurrentTime] = useState("");
   const [isOnline, setIsOnline] = useState(true);
   const [terminalOpen, setTerminalOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1500);
@@ -68,6 +71,7 @@ export default function Portfolio() {
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
+    setMobileMenuOpen(false); // Close mobile menu after navigation
   };
 
   const terminalCommands = [
@@ -76,6 +80,24 @@ export default function Portfolio() {
     "docker compose up -d --build",
     "yarn test --coverage",
     "bun dev --turbo",
+  ];
+
+  const navItems = [
+    {
+      name: "Education",
+      section: "education",
+      cmd: "cat education.md",
+    },
+    {
+      name: "Tech Stack",
+      section: "techstack",
+      cmd: "ls -la tech/",
+    },
+    {
+      name: "Connect",
+      section: "connect",
+      cmd: "curl contact.dev",
+    },
   ];
 
   if (isLoading) {
@@ -118,29 +140,31 @@ export default function Portfolio() {
       {/* Advanced Developer Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-40 bg-black/95 backdrop-blur-sm border-b border-gray-800">
         <div className="container mx-auto">
-          {/* Top Status Bar */}
-          <div className="flex justify-between items-center py-2 px-4 text-xs text-gray-400 border-b border-gray-800/50">
-            <div className="flex items-center space-x-6">
+          {/* Top Status Bar - Hidden on small mobile */}
+          <div className="hidden sm:flex justify-between items-center py-2 px-4 text-xs text-gray-400 border-b border-gray-800/50">
+            <div className="flex items-center space-x-3 md:space-x-6">
               <div className="flex items-center space-x-2">
                 <div
                   className={`w-2 h-2 rounded-full ${
                     isOnline ? "bg-green-400" : "bg-red-400"
                   }`}
                 ></div>
-                <span>{isOnline ? "ONLINE" : "OFFLINE"}</span>
+                <span className="hidden md:inline">
+                  {isOnline ? "ONLINE" : "OFFLINE"}
+                </span>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="hidden md:flex items-center space-x-2">
                 <Terminal size={12} />
                 <span>dev-env:active</span>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="hidden lg:flex items-center space-x-2">
                 <Coffee size={12} />
                 <span>caffeine:high</span>
               </div>
             </div>
-            <div className="flex items-center space-x-6">
-              <span>UTC+7 {currentTime}</span>
-              <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3 md:space-x-6">
+              <span className="hidden sm:inline">UTC+7 {currentTime}</span>
+              <div className="hidden md:flex items-center space-x-2">
                 <Code2 size={12} />
                 <span>TypeScript</span>
               </div>
@@ -162,7 +186,9 @@ export default function Portfolio() {
                   <div className="w-3 h-3 rounded-full bg-green-500"></div>
                 </div>
                 <div className="text-green-400">
-                  <span className="text-gray-400">developer@portfolio:~$</span>
+                  <span className="text-gray-400 text-sm md:text-base">
+                    developer@portfolio:~$
+                  </span>
                   <motion.span
                     animate={{ opacity: [1, 0, 1] }}
                     transition={{ duration: 1, repeat: Infinity }}
@@ -174,30 +200,14 @@ export default function Portfolio() {
               </div>
             </motion.div>
 
-            {/* Navigation Menu */}
+            {/* Desktop Navigation Menu */}
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="hidden md:flex items-center space-x-8"
+              className="hidden lg:flex items-center space-x-8"
             >
-              {[
-                {
-                  name: "Education",
-                  section: "education",
-                  cmd: "cat education.md",
-                },
-                {
-                  name: "Tech Stack",
-                  section: "techstack",
-                  cmd: "ls -la tech/",
-                },
-                {
-                  name: "Connect",
-                  section: "connect",
-                  cmd: "curl contact.dev",
-                },
-              ].map((item, index) => (
+              {navItems.map((item, index) => (
                 <motion.button
                   key={item.name}
                   onClick={() => scrollToSection(item.section)}
@@ -217,25 +227,25 @@ export default function Portfolio() {
               ))}
             </motion.div>
 
-            {/* Developer Tools */}
+            {/* Mobile Menu Button and Desktop Tools */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
-              className="flex items-center space-x-4"
+              className="flex items-center space-x-2 md:space-x-4"
             >
-              {/* Terminal Toggle */}
+              {/* Terminal Toggle - Hidden on small mobile */}
               <motion.button
                 onClick={() => setTerminalOpen(!terminalOpen)}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="p-2 border border-gray-700 hover:border-gray-500 transition-colors"
+                className="hidden sm:flex p-2 border border-gray-700 hover:border-gray-500 transition-colors"
               >
                 <Terminal size={16} />
               </motion.button>
 
-              {/* Social Links with Tooltips */}
-              <div className="flex space-x-3">
+              {/* Social Links - Responsive sizing */}
+              <div className="hidden md:flex space-x-3">
                 {[
                   {
                     icon: Github,
@@ -272,8 +282,84 @@ export default function Portfolio() {
                   </motion.a>
                 ))}
               </div>
+
+              {/* Mobile Menu Button */}
+              <motion.button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="lg:hidden p-2 border border-gray-700 hover:border-gray-500 transition-colors"
+              >
+                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </motion.button>
             </motion.div>
           </div>
+
+          {/* Mobile Menu */}
+          <AnimatePresence>
+            {mobileMenuOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="lg:hidden border-t border-gray-800 bg-gray-900/50 overflow-hidden"
+              >
+                <div className="p-4 space-y-4">
+                  {navItems.map((item, index) => (
+                    <motion.button
+                      key={item.name}
+                      onClick={() => scrollToSection(item.section)}
+                      className="block w-full text-left text-gray-300 hover:text-white transition-colors font-mono py-2"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      ./{item.name.toLowerCase()}
+                    </motion.button>
+                  ))}
+
+                  {/* Mobile Social Links */}
+                  <div className="pt-4 border-t border-gray-800">
+                    <div className="flex space-x-4">
+                      {[
+                        {
+                          icon: Github,
+                          url: "https://github.com/VarithPheng",
+                          label: "GitHub",
+                        },
+                        {
+                          icon: Linkedin,
+                          url: "https://www.linkedin.com/in/varith-pheng-85508a2ba/",
+                          label: "LinkedIn",
+                        },
+                        {
+                          icon: Send,
+                          url: "https://t.me/Varith_Pheng",
+                          label: "Telegram",
+                        },
+                      ].map(({ icon: Icon, url, label }) => (
+                        <motion.a
+                          key={label}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 hover:bg-gray-800 rounded transition-colors"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Icon
+                            size={20}
+                            className="text-gray-400 hover:text-white transition-colors"
+                          />
+                        </motion.a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Mini Terminal */}
           <AnimatePresence>
@@ -318,7 +404,7 @@ export default function Portfolio() {
       {/* Hero Section */}
       <section
         className="section min-h-screen flex items-center"
-        style={{ paddingTop: "140px" }}
+        style={{ paddingTop: "100px" }}
       >
         <div className="container mx-auto">
           <div className="grid-2">
@@ -326,13 +412,14 @@ export default function Portfolio() {
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
+              className="order-2 lg:order-1"
             >
-              <h1 className="mb-10">
+              <h1 className="mb-6 lg:mb-10">
                 Software Developer
                 <br />
                 Based in Phnom Penh
               </h1>
-              <p className="text-gray-400 text-lg mb-16 leading-relaxed max-w-lg">
+              <p className="text-gray-400 text-base lg:text-lg mb-8 lg:mb-16 leading-relaxed max-w-lg">
                 3rd year university student passionate about creating clean,
                 functional software solutions with modern technologies.
               </p>
@@ -342,7 +429,7 @@ export default function Portfolio() {
                   download
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="btn-primary inline-flex items-center gap-3"
+                  className="btn-primary inline-flex items-center justify-center gap-3 text-center"
                 >
                   <Download size={16} />
                   Download CV
@@ -351,7 +438,7 @@ export default function Portfolio() {
                   onClick={() => scrollToSection("connect")}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="btn-secondary"
+                  className="btn-secondary text-center"
                 >
                   Get in touch
                 </motion.button>
@@ -362,17 +449,25 @@ export default function Portfolio() {
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
-              className="flex justify-center lg:justify-end"
+              className="flex justify-center lg:justify-end order-1 lg:order-2 mb-8 lg:mb-0"
             >
               <div className="relative">
-                <div className="w-80 h-80 border border-gray-700 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-24 h-24 border border-gray-600 rounded-full mx-auto mb-6 flex items-center justify-center">
-                      <span className="text-2xl font-mono">VP</span>
+                <div className="w-64 h-64 sm:w-80 sm:h-80 border border-gray-700 flex items-center justify-center">
+                  <div className="text-center flex flex-col items-center">
+                    <div className="w-16 h-16 sm:w-24 sm:h-24 border border-gray-600 rounded-full mx-auto mb-4 sm:mb-6 overflow-hidden">
+                      <Image
+                        src="/assets/varith.jpg"
+                        alt="Varith PHENG"
+                        width={96}
+                        height={96}
+                        className="w-full h-full object-cover object-center"
+                      />
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-lg font-medium">Varith PHENG</h3>
-                      <p className="text-gray-400 text-sm">
+                      <h3 className="text-base sm:text-lg font-medium">
+                        Varith PHENG
+                      </h3>
+                      <p className="text-gray-400 text-xs sm:text-sm">
                         SOFTWARE DEVELOPER
                       </p>
                     </div>
@@ -392,9 +487,9 @@ export default function Portfolio() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="mb-20"
+            className="mb-12 lg:mb-20"
           >
-            <h2 className="mb-8">Academic Background</h2>
+            <h2 className="mb-6 lg:mb-8">Academic Background</h2>
             <p className="text-gray-400 max-w-2xl">
               Currently pursuing dual bachelor degrees in Computer Science and
               Information Technology Management.
@@ -407,11 +502,11 @@ export default function Portfolio() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               viewport={{ once: true }}
-              className="border border-gray-700 p-8 rounded-lg bg-gray-900/20 hover:bg-gray-900/40 transition-colors"
+              className="border border-gray-700 p-6 lg:p-8 rounded-lg bg-gray-900/20 hover:bg-gray-900/40 transition-colors"
             >
-              <div className="mb-8">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="relative h-12 w-32 flex-shrink-0">
+              <div className="mb-6 lg:mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4 lg:mb-6">
+                  <div className="relative h-8 w-24 sm:h-12 sm:w-32 flex-shrink-0">
                     <Image
                       src="/assets/aupp.png"
                       alt="American University of Phnom Penh Logo"
@@ -419,15 +514,17 @@ export default function Portfolio() {
                       className="object-contain object-left"
                     />
                   </div>
-                  <h3 className="text-xl font-medium">
+                  <h3 className="text-lg lg:text-xl font-medium">
                     American University of Phnom Penh
                   </h3>
                 </div>
-                <div className="ml-36 space-y-3">
-                  <p className="text-gray-300 text-lg">
+                <div className="sm:ml-28 lg:ml-36 space-y-3">
+                  <p className="text-gray-300 text-base lg:text-lg">
                     Bachelor of Science in Information Technology Management
                   </p>
-                  <p className="text-gray-500">2022 - Present</p>
+                  <p className="text-gray-500 text-sm lg:text-base">
+                    2022 - Present
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -437,11 +534,11 @@ export default function Portfolio() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
               viewport={{ once: true }}
-              className="border border-gray-700 p-8 rounded-lg bg-gray-900/20 hover:bg-gray-900/40 transition-colors"
+              className="border border-gray-700 p-6 lg:p-8 rounded-lg bg-gray-900/20 hover:bg-gray-900/40 transition-colors"
             >
-              <div className="mb-8">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="relative h-12 w-32 flex-shrink-0">
+              <div className="mb-6 lg:mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4 lg:mb-6">
+                  <div className="relative h-8 w-24 sm:h-12 sm:w-32 flex-shrink-0">
                     <Image
                       src="/assets/fhsu.png"
                       alt="Fort Hays State University Logo"
@@ -449,15 +546,17 @@ export default function Portfolio() {
                       className="object-contain object-left"
                     />
                   </div>
-                  <h3 className="text-xl font-medium">
+                  <h3 className="text-lg lg:text-xl font-medium">
                     Fort Hays State University
                   </h3>
                 </div>
-                <div className="ml-36 space-y-3">
-                  <p className="text-gray-300 text-lg">
+                <div className="sm:ml-28 lg:ml-36 space-y-3">
+                  <p className="text-gray-300 text-base lg:text-lg">
                     Bachelor of Science in Computer Science
                   </p>
-                  <p className="text-gray-500">2022 - Present</p>
+                  <p className="text-gray-500 text-sm lg:text-base">
+                    2022 - Present
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -474,13 +573,13 @@ export default function Portfolio() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="mb-20"
+            className="mb-12 lg:mb-20"
           >
-            <h2 className="mb-8">Programming Languages</h2>
-            <p className="text-gray-400 max-w-2xl mb-20">
+            <h2 className="mb-6 lg:mb-8">Programming Languages</h2>
+            <p className="text-gray-400 max-w-2xl mb-12 lg:mb-20">
               Core programming languages I use for development.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-10">
               {[
                 {
                   name: "TypeScript",
@@ -504,17 +603,19 @@ export default function Portfolio() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className="skill-item group p-6 border border-gray-700 rounded-lg bg-gray-900/20 hover:bg-gray-900/40 transition-colors"
+                  className="skill-item group p-4 lg:p-6 border border-gray-700 rounded-lg bg-gray-900/20 hover:bg-gray-900/40 transition-colors"
                 >
-                  <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-4 lg:gap-6">
                     <Icon
                       icon={lang.icon}
-                      width={40}
-                      height={40}
-                      className="text-gray-400 group-hover:text-white transition-colors flex-shrink-0"
+                      width={32}
+                      height={32}
+                      className="text-gray-400 group-hover:text-white transition-colors flex-shrink-0 sm:w-10 sm:h-10"
                       style={{ color: lang.color }}
                     />
-                    <span className="text-xl font-medium">{lang.name}</span>
+                    <span className="text-lg lg:text-xl font-medium">
+                      {lang.name}
+                    </span>
                   </div>
                 </motion.div>
               ))}
@@ -527,18 +628,18 @@ export default function Portfolio() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="mb-20"
+            className="mb-12 lg:mb-20"
           >
-            <h2 className="mb-8">Tech Stack</h2>
-            <p className="text-gray-400 max-w-2xl mb-20">
+            <h2 className="mb-6 lg:mb-8">Tech Stack</h2>
+            <p className="text-gray-400 max-w-2xl mb-12 lg:mb-20">
               Technologies and tools I use to build modern, scalable
               applications.
             </p>
 
-            <div className="space-y-12">
+            <div className="space-y-8 lg:space-y-12">
               {/* First Marquee Row - Right to Left */}
               <Marquee
-                className="rounded-xl bg-gray-900/30 backdrop-blur-sm border border-gray-800/50 py-6"
+                className="rounded-xl bg-gray-900/30 backdrop-blur-sm border border-gray-800/50 py-4 lg:py-6"
                 pauseOnHover={true}
                 reverse={true}
                 loadingDelay={800}
@@ -548,7 +649,7 @@ export default function Portfolio() {
 
               {/* Second Marquee Row - Left to Right */}
               <Marquee
-                className="rounded-xl bg-gray-900/30 backdrop-blur-sm border border-gray-800/50 py-6"
+                className="rounded-xl bg-gray-900/30 backdrop-blur-sm border border-gray-800/50 py-4 lg:py-6"
                 pauseOnHover={true}
                 reverse={false}
                 loadingDelay={800}
@@ -569,18 +670,21 @@ export default function Portfolio() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
+              className="order-2 lg:order-1"
             >
-              <h2 className="mb-12">Let&apos;s Connect</h2>
+              <h2 className="mb-8 lg:mb-12">Let&apos;s Connect</h2>
 
-              <div className="space-y-8 mb-16">
+              <div className="space-y-6 lg:space-y-8 mb-12 lg:mb-16">
                 <div className="flex items-center gap-4">
-                  <Phone size={18} className="text-gray-400" />
-                  <span>+855 89 980 726</span>
+                  <Phone size={18} className="text-gray-400 flex-shrink-0" />
+                  <span className="text-sm lg:text-base">+855 89 980 726</span>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <Mail size={18} className="text-gray-400" />
-                  <span>p.varith@gmail.com</span>
+                  <Mail size={18} className="text-gray-400 flex-shrink-0" />
+                  <span className="text-sm lg:text-base break-all">
+                    p.varith@gmail.com
+                  </span>
                 </div>
               </div>
 
@@ -617,9 +721,10 @@ export default function Portfolio() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               viewport={{ once: true }}
+              className="order-1 lg:order-2 mb-8 lg:mb-0"
             >
-              <form className="space-y-8">
-                <div className="grid md:grid-cols-2 gap-8">
+              <form className="space-y-6 lg:space-y-8">
+                <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
                   <div>
                     <input
                       type="text"
@@ -658,7 +763,7 @@ export default function Portfolio() {
                   type="submit"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="btn-primary"
+                  className="btn-primary w-full sm:w-auto"
                 >
                   Send Message
                 </motion.button>
@@ -669,9 +774,9 @@ export default function Portfolio() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 border-t border-gray-800">
+      <footer className="py-8 lg:py-12 border-t border-gray-800">
         <div className="container mx-auto text-center">
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-400 text-xs lg:text-sm">
             © 2025 Varith PHENG. All rights reserved.
           </p>
         </div>
