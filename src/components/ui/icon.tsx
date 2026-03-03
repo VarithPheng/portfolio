@@ -66,12 +66,12 @@ interface TechIconProps {
 // Loading skeleton component
 const IconSkeleton = ({ className }: { className?: string }) => (
   <div
-    className={`flex flex-col items-center justify-center p-5 mx-3 min-w-[108px] h-[90px] border border-white/[0.07] rounded-xl bg-white/[0.02] ${
+    className={`flex flex-col items-center justify-center p-6 mx-4 min-w-[120px] h-[100px] border border-gray-700 rounded-xl bg-black/40 backdrop-blur-sm ${
       className || ""
     }`}
   >
-    <div className="w-6 h-6 bg-white/10 rounded animate-pulse mb-2"></div>
-    <div className="w-14 h-2.5 bg-white/10 rounded animate-pulse"></div>
+    <div className="w-7 h-7 bg-gray-600 rounded animate-pulse mb-2"></div>
+    <div className="w-16 h-3 bg-gray-600 rounded animate-pulse"></div>
   </div>
 );
 
@@ -102,12 +102,12 @@ export const TechIcon = ({
   if (hasError) {
     return (
       <div
-        className={`flex flex-col items-center justify-center p-5 mx-3 min-w-[108px] h-[90px] border border-white/[0.07] rounded-xl bg-white/[0.02] ${className}`}
+        className={`flex flex-col items-center justify-center p-6 mx-4 min-w-[120px] h-[100px] border border-gray-700 rounded-xl bg-black/40 backdrop-blur-sm ${className}`}
       >
-        <div className="w-6 h-6 bg-white/10 rounded flex items-center justify-center text-xs text-white/30">
+        <div className="w-7 h-7 bg-gray-500 rounded flex items-center justify-center text-xs">
           ?
         </div>
-        <span className="text-xs text-white/30 mt-2">{tech.name}</span>
+        <span className="text-xs text-gray-500 mt-2">{tech.name}</span>
       </div>
     );
   }
@@ -115,17 +115,17 @@ export const TechIcon = ({
   try {
     return (
       <div
-        className={`flex flex-col items-center justify-center p-5 mx-3 min-w-[108px] h-[90px] border border-white/[0.07] rounded-xl bg-white/[0.02] hover:border-white/[0.14] hover:bg-white/[0.05] transition-all duration-300 group cursor-pointer ${className}`}
+        className={`flex flex-col items-center justify-center p-6 mx-4 min-w-[120px] h-[100px] border border-gray-700 rounded-xl bg-black/40 backdrop-blur-sm hover:border-gray-500 hover:bg-white/5 transition-all duration-300 group cursor-pointer ${className}`}
       >
         <Icon
           icon={tech.icon}
-          width={26}
-          height={26}
+          width={28}
+          height={28}
           style={{ color: tech.color }}
-          className="mb-2 opacity-80 group-hover:opacity-100 transition-opacity"
+          className="mb-2"
           onError={() => setHasError(true)}
         />
-        <span className="text-[13px] font-medium text-white/45 group-hover:text-white/80 transition-colors">
+        <span className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors">
           {tech.name}
         </span>
       </div>

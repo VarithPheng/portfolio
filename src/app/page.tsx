@@ -1,418 +1,797 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { Github, Linkedin, Send, Download, Phone, Mail, ShoppingBag } from "lucide-react";
+import {
+  Github,
+  Linkedin,
+  Send,
+  Download,
+  Phone,
+  Mail,
+  Terminal,
+  Code2,
+  Coffee,
+  Menu,
+  X,
+  ShoppingBag,
+} from "lucide-react";
 import { Icon } from "@iconify/react";
 import { Marquee } from "@/components/magicui/marquee";
 import { FrontendIcons, BackendIcons } from "@/components/ui/icon";
 
-// ─── Layout rule ─────────────────────────────────────────────────────────────
-// Every section has NO horizontal padding.
-// All horizontal padding + max-width lives in ONE inner wrapper:
-//   <div className="w-full max-w-5xl mx-auto px-5 lg:px-8">
-// This guarantees pixel-perfect centering at all screen widths.
-// ─────────────────────────────────────────────────────────────────────────────
-
 export default function Portfolio() {
-  const [isLoading,   setIsLoading]   = useState(true);
-  const [isOnline,    setIsOnline]    = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState("");
+  const [isOnline, setIsOnline] = useState(true);
+  const [terminalOpen, setTerminalOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setIsLoading(false), 1200);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => setIsLoading(false), 1500);
+    return () => clearTimeout(timer);
   }, []);
 
+  // Update time every second
   useEffect(() => {
-    const on  = () => setIsOnline(true);
-    const off = () => setIsOnline(false);
-    window.addEventListener("online",  on);
-    window.addEventListener("offline", off);
-    return () => {
-      window.removeEventListener("online",  on);
-      window.removeEventListener("offline", off);
-    };
-  }, []);
-
-  useEffect(() => {
-    const tick = () => {
+    const updateTime = () => {
       const now = new Date();
-      const h   = (now.getUTCHours() + 7) % 24;
-      const m   = now.getUTCMinutes();
-      setCurrentTime(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+      setCurrentTime(
+        now.toLocaleTimeString("en-US", {
+          hour12: false,
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        })
+      );
     };
-    tick();
-    const id = setInterval(tick, 60_000);
-    return () => clearInterval(id);
+
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
   }, []);
 
-  const scrollTo = (id: string) =>
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  // Check online status
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
 
-  const LANGUAGES = [
-    { name: "TypeScript", icon: "skill-icons:typescript",  color: "#3178C6" },
-    { name: "Python",     icon: "skill-icons:python-dark", color: "#3776AB" },
-    { name: "Java",       icon: "skill-icons:java-dark",   color: "#ED8B00" },
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  // Smooth scroll function
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+    setMobileMenuOpen(false); // Close mobile menu after navigation
+  };
+
+  const terminalCommands = [
+    "git status",
+    "bun run build",
+    "docker compose up -d --build",
+    "yarn test --coverage",
+    "bun dev --turbo",
   ];
 
-  const EDUCATION = [
+  const navItems = [
     {
-      logo:   "/assets/aupp.png",
-      name:   "American University of Phnom Penh",
-      degree: "B.S. Information Technology Management",
-      years:  "2022 – Present",
+      name: "Education",
+      section: "education",
+      cmd: "cat education.md",
     },
     {
-      logo:   "/assets/fhsu.png",
-      name:   "Fort Hays State University",
-      degree: "B.S. Computer Science",
-      years:  "2022 – Present",
+      name: "Tech Stack",
+      section: "techstack",
+      cmd: "ls -la tech/",
+    },
+    {
+      name: "Connect",
+      section: "connect",
+      cmd: "curl contact.dev",
     },
   ];
 
-  /* ── Loading ─────────────────────────────────────────────────────────────── */
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-[#030303] flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black flex items-center justify-center z-50">
         <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="flex flex-col items-center gap-5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center"
         >
-          <div className="glass w-14 h-14 !rounded-2xl flex items-center justify-center">
-            <span className="text-white/75 font-semibold text-lg tracking-wide select-none relative z-10">
-              VP
-            </span>
-          </div>
-          <div className="flex gap-1.5">
-            {[0, 1, 2].map((i) => (
-              <motion.div
-                key={i}
-                className="w-1.5 h-1.5 rounded-full bg-white/20"
-                animate={{ opacity: [0.2, 1, 0.2] }}
-                transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
-              />
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            className="w-8 h-8 border border-white border-t-transparent mx-auto mb-8"
+          />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="flex space-x-2 text-white text-sm tracking-widest"
+          >
+            {["L", "O", "A", "D", "I", "N", "G"].map((letter, index) => (
+              <motion.span
+                key={index}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 + index * 0.1 }}
+              >
+                {letter}
+              </motion.span>
             ))}
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     );
   }
 
-  /* ── Page ────────────────────────────────────────────────────────────────── */
   return (
-    <div className="bg-[#030303] text-white">
-
-      {/* ── Background blobs — glass needs something behind it to blur ────── */}
-      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
-        <div className="absolute -top-[200px] -left-[200px] w-[600px] h-[600px] rounded-full bg-white/[0.025] blur-[140px]" />
-        <div className="absolute -bottom-[200px] -right-[200px] w-[500px] h-[500px] rounded-full bg-white/[0.02]  blur-[120px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full bg-white/[0.012] blur-[100px]" />
-      </div>
-
-      {/* ── Floating Pill Navbar ──────────────────────────────────────────── */}
-      <motion.nav
-        className="fixed top-5 left-1/2 -translate-x-1/2 z-40"
-        initial={{ opacity: 0, y: -16 }}
-        animate={{ opacity: 1,  y: 0   }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-      >
-        <div className="glass-pill px-5 py-2.5 flex items-center gap-4 whitespace-nowrap">
-          <div className="flex items-center gap-2">
-            <motion.span
-              className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isOnline ? "bg-emerald-400" : "bg-red-400"}`}
-              animate={isOnline ? { scale: [1, 1.4, 1] } : {}}
-              transition={{ duration: 2.5, repeat: Infinity }}
-            />
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="text-white/80 text-sm font-medium tracking-wide hover:text-white transition-colors"
-            >
-              Varith
-            </button>
-          </div>
-
-          <div className="w-px h-3.5 bg-white/10 flex-shrink-0" />
-
-          <div className="hidden lg:flex items-center gap-5">
-            {[
-              { label: "About",   id: "education" },
-              { label: "Stack",   id: "techstack"  },
-              { label: "Connect", id: "connect"    },
-            ].map(({ label, id }) => (
-              <button
-                key={id}
-                onClick={() => scrollTo(id)}
-                className="text-white/40 text-sm hover:text-white/80 transition-colors"
-              >
-                {label}
-              </button>
-            ))}
-            <div className="w-px h-3.5 bg-white/10 flex-shrink-0" />
-          </div>
-
-          <Link
-            href="/store"
-            className="flex items-center gap-1.5 text-white/40 text-sm hover:text-white/80 transition-colors"
-          >
-            <ShoppingBag size={13} /> Store
-          </Link>
-
-          {currentTime && (
-            <span className="hidden lg:block text-white/20 text-xs font-mono tabular-nums">
-              {currentTime}
-            </span>
-          )}
-          <div className="hidden lg:block w-px h-3.5 bg-white/10 flex-shrink-0" />
-
-          <div className="flex items-center gap-3">
-            <a href="https://github.com/VarithPheng"                      target="_blank" rel="noopener noreferrer" className="text-white/35 hover:text-white/80 transition-colors"><Github   size={13} /></a>
-            <a href="https://www.linkedin.com/in/varith-pheng-85508a2ba/" target="_blank" rel="noopener noreferrer" className="text-white/35 hover:text-white/80 transition-colors"><Linkedin size={13} /></a>
-            <a href="https://t.me/Varith_Pheng"                           target="_blank" rel="noopener noreferrer" className="text-white/35 hover:text-white/80 transition-colors"><Send     size={13} /></a>
-          </div>
-        </div>
-      </motion.nav>
-
-      {/* ─────────────────────────────────────────────────────────────────────
-          HERO
-          min-h-screen + flex items-center + py-24 (symmetric) = content at 50vh
-          No horizontal padding on <section> — all padding inside the wrapper div
-          ─────────────────────────────────────────────────────────────────── */}
-      <section className="min-h-screen flex items-center py-24">
-        <div className="w-full max-w-5xl mx-auto px-5 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-
-            {/* Text */}
-            <motion.div
-              className="space-y-8 text-center lg:text-left order-2 lg:order-1"
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1,  y: 0  }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <div className="space-y-3">
-                <p className="eyebrow">Software Developer · Phnom Penh</p>
-                <h1
-                  className="font-bold text-white tracking-tight leading-[1.05]"
-                  style={{ fontSize: "clamp(2.6rem, 6vw, 4.5rem)" }}
-                >
-                  Varith<br />PHENG
-                </h1>
+    <div className="min-h-screen bg-black text-white">
+      {/* Advanced Developer Navbar */}
+      <nav className="fixed top-0 left-0 right-0 z-40 bg-black/95 backdrop-blur-sm border-b border-gray-800">
+        <div className="container mx-auto">
+          {/* Top Status Bar - Hidden on small mobile */}
+          <div className="hidden sm:flex justify-between items-center py-2 px-4 text-xs text-gray-400 border-b border-gray-800/50">
+            <div className="flex items-center space-x-3 md:space-x-6">
+              <div className="flex items-center space-x-2">
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    isOnline ? "bg-green-400" : "bg-red-400"
+                  }`}
+                ></div>
+                <span className="hidden md:inline">
+                  {isOnline ? "ONLINE" : "OFFLINE"}
+                </span>
               </div>
-              <p className="text-white/45 text-[15px] leading-relaxed max-w-sm mx-auto lg:mx-0">
-                3rd year student at AUPP &amp; FHSU, building full-stack
-                applications with modern web technologies.
+              <div className="hidden md:flex items-center space-x-2">
+                <Terminal size={12} />
+                <span>dev-env:active</span>
+              </div>
+              <div className="hidden lg:flex items-center space-x-2">
+                <Coffee size={12} />
+                <span>caffeine:high</span>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3 md:space-x-6">
+              <span className="hidden sm:inline">UTC+7 {currentTime}</span>
+              <div className="hidden md:flex items-center space-x-2">
+                <Code2 size={12} />
+                <span>TypeScript</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Navigation */}
+          <div className="flex justify-between items-center py-4">
+            {/* Developer Identity */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="font-mono"
+            >
+              <div className="flex items-center space-x-3">
+                <div className="flex space-x-1">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                </div>
+                <div className="text-green-400">
+                  <span className="text-gray-400 text-sm md:text-base">
+                    developer@portfolio:~$
+                  </span>
+                  <motion.span
+                    animate={{ opacity: [1, 0, 1] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                    className="ml-1"
+                  >
+                    _
+                  </motion.span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Desktop Navigation Menu */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="hidden lg:flex items-center space-x-8"
+            >
+              {navItems.map((item, index) => (
+                <motion.button
+                  key={item.name}
+                  onClick={() => scrollToSection(item.section)}
+                  className="group relative"
+                  whileHover={{ scale: 1.05 }}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + index * 0.1 }}
+                >
+                  <div className="text-gray-300 hover:text-white transition-colors font-mono text-sm">
+                    ./{item.name.toLowerCase()}
+                  </div>
+                  <div className="absolute -bottom-8 left-0 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-green-400 font-mono whitespace-nowrap">
+                    $ {item.cmd}
+                  </div>
+                </motion.button>
+              ))}
+            </motion.div>
+
+            {/* Mobile Menu Button and Desktop Tools */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+              className="flex items-center space-x-2 md:space-x-4"
+            >
+              {/* Store Link */}
+              <Link
+                href="/store"
+                className="flex items-center gap-1.5 p-2 border border-gray-700 hover:border-gray-500 transition-colors text-gray-400 hover:text-white text-sm"
+              >
+                <ShoppingBag size={16} />
+                <span className="hidden md:inline font-mono text-xs">Store</span>
+              </Link>
+
+              {/* Terminal Toggle - Hidden on small mobile */}
+              <motion.button
+                onClick={() => setTerminalOpen(!terminalOpen)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="hidden sm:flex p-2 border border-gray-700 hover:border-gray-500 transition-colors"
+              >
+                <Terminal size={16} />
+              </motion.button>
+
+              {/* Social Links - Responsive sizing */}
+              <div className="hidden md:flex space-x-3">
+                {[
+                  {
+                    icon: Github,
+                    url: "https://github.com/VarithPheng",
+                    label: "GitHub",
+                  },
+                  {
+                    icon: Linkedin,
+                    url: "https://www.linkedin.com/in/varith-pheng-85508a2ba/",
+                    label: "LinkedIn",
+                  },
+                  {
+                    icon: Send,
+                    url: "https://t.me/Varith_Pheng",
+                    label: "Telegram",
+                  },
+                ].map(({ icon: Icon, url, label }) => (
+                  <motion.a
+                    key={label}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group relative p-2 hover:bg-gray-900 transition-colors"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <Icon
+                      size={16}
+                      className="text-gray-400 group-hover:text-white transition-colors"
+                    />
+                    <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-xs text-gray-400 whitespace-nowrap">
+                      {label}
+                    </div>
+                  </motion.a>
+                ))}
+              </div>
+
+              {/* Mobile Menu Button */}
+              <motion.button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="lg:hidden p-2 border border-gray-700 hover:border-gray-500 transition-colors"
+              >
+                {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+              </motion.button>
+            </motion.div>
+          </div>
+
+          {/* Mobile Menu */}
+          <AnimatePresence>
+            {mobileMenuOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="lg:hidden border-t border-gray-800 bg-gray-900/50 overflow-hidden"
+              >
+                <div className="p-4 space-y-4">
+                  {navItems.map((item, index) => (
+                    <motion.button
+                      key={item.name}
+                      onClick={() => scrollToSection(item.section)}
+                      className="block w-full text-left text-gray-300 hover:text-white transition-colors font-mono py-2"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      ./{item.name.toLowerCase()}
+                    </motion.button>
+                  ))}
+
+                  {/* Mobile Social Links */}
+                  <div className="pt-4 border-t border-gray-800">
+                    <div className="flex space-x-4">
+                      {[
+                        {
+                          icon: Github,
+                          url: "https://github.com/VarithPheng",
+                          label: "GitHub",
+                        },
+                        {
+                          icon: Linkedin,
+                          url: "https://www.linkedin.com/in/varith-pheng-85508a2ba/",
+                          label: "LinkedIn",
+                        },
+                        {
+                          icon: Send,
+                          url: "https://t.me/Varith_Pheng",
+                          label: "Telegram",
+                        },
+                      ].map(({ icon: Icon, url, label }) => (
+                        <motion.a
+                          key={label}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 hover:bg-gray-800 rounded transition-colors"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <Icon
+                            size={20}
+                            className="text-gray-400 hover:text-white transition-colors"
+                          />
+                        </motion.a>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Mini Terminal */}
+          <AnimatePresence>
+            {terminalOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="border-t border-gray-800 bg-gray-900/50 overflow-hidden"
+              >
+                <div className="p-4 font-mono text-sm">
+                  <div className="flex items-center space-x-2 text-green-400 mb-2">
+                    <span>varith@portfolio:~$</span>
+                    <motion.span
+                      animate={{ opacity: [1, 0, 1] }}
+                      transition={{ duration: 1, repeat: Infinity }}
+                    >
+                      _
+                    </motion.span>
+                  </div>
+                  <div className="space-y-1 text-gray-300 text-xs">
+                    {terminalCommands.map((cmd, index) => (
+                      <motion.div
+                        key={cmd}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="hover:text-white cursor-pointer"
+                      >
+                        <span className="text-green-400">$</span> {cmd}
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section
+        className="section min-h-screen flex items-center"
+        style={{ paddingTop: "100px" }}
+      >
+        <div className="container mx-auto">
+          <div className="grid-2">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="order-2 lg:order-1"
+            >
+              <h1 className="mb-6 lg:mb-10">
+                Software Developer
+                <br />
+                Based in Phnom Penh
+              </h1>
+              <p className="text-gray-400 text-base lg:text-lg mb-8 lg:mb-16 leading-relaxed max-w-lg">
+                3rd year university student passionate about creating clean,
+                functional software solutions with modern technologies.
               </p>
-              <div className="flex flex-col lg:flex-row gap-3 items-center lg:items-start">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <motion.a
                   href="/assets/cv.pdf"
                   download
-                  className="btn-primary w-full lg:w-auto"
                   whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="btn-primary inline-flex items-center justify-center gap-3 text-center"
                 >
-                  <Download size={14} /> Download CV
+                  <Download size={16} />
+                  Download CV
                 </motion.a>
                 <motion.button
-                  onClick={() => scrollTo("connect")}
-                  className="btn-outline w-full lg:w-auto"
+                  onClick={() => scrollToSection("connect")}
                   whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.97 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="btn-secondary text-center"
                 >
                   Get in touch
                 </motion.button>
               </div>
             </motion.div>
 
-            {/* Photo */}
             <motion.div
-              className="flex justify-center lg:justify-end order-1 lg:order-2"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1,  scale: 1   }}
-              transition={{ duration: 0.6, delay: 0.3 }}
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="flex justify-center lg:justify-end order-1 lg:order-2 mb-8 lg:mb-0"
             >
-              <div className="glass-photo-frame">
-                <div className="relative rounded-[22px] overflow-hidden">
-                  <Image
-                    src="/assets/varith.jpg"
-                    alt="Varith PHENG"
-                    width={280}
-                    height={336}
-                    className="w-[200px] h-[240px] lg:w-[280px] lg:h-[336px] object-cover object-center block"
-                    priority
-                  />
-                  <div className="glass-name-tag">
-                    <span className="text-white/80 text-sm font-medium">Varith PHENG</span>
-                    <span className="text-white/30 text-[11px] tracking-widest uppercase">Software Developer</span>
+              <div className="relative">
+                <div className="w-64 h-64 sm:w-80 sm:h-80 border border-gray-700 flex items-center justify-center">
+                  <div className="text-center flex flex-col items-center">
+                    <div className="w-16 h-16 sm:w-24 sm:h-24 border border-gray-600 rounded-full mx-auto mb-4 sm:mb-6 overflow-hidden">
+                      <Image
+                        src="/assets/varith.jpg"
+                        alt="Varith PHENG"
+                        width={96}
+                        height={96}
+                        className="w-full h-full object-cover object-center"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-base sm:text-lg font-medium">
+                        Varith PHENG
+                      </h3>
+                      <p className="text-gray-400 text-xs sm:text-sm">
+                        SOFTWARE DEVELOPER
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </motion.div>
-
           </div>
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────────────────────
-          BENTO GRID
-          Same wrapper: w-full max-w-5xl mx-auto px-5 lg:px-8
-          ─────────────────────────────────────────────────────────────────── */}
-      <section className="pb-28">
-        <div className="w-full max-w-5xl mx-auto px-5 lg:px-8">
-          <div className="bento-grid">
+      {/* Education Section */}
+      <section id="education" className="section section-alt">
+        <div className="container mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="mb-12 lg:mb-20"
+          >
+            <h2 className="mb-6 lg:mb-8">Academic Background</h2>
+            <p className="text-gray-400 max-w-2xl">
+              Currently pursuing dual bachelor degrees in Computer Science and
+              Information Technology Management.
+            </p>
+          </motion.div>
 
-            {/* Education */}
+          <div className="grid-2">
             <motion.div
-              id="education"
-              className="glass bento-edu p-7 lg:p-9"
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.45 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="border border-gray-700 p-6 lg:p-8 rounded-lg bg-gray-900/20 hover:bg-gray-900/40 transition-colors"
             >
-              <p className="eyebrow mb-6">Education</p>
-              <div className="space-y-6 relative z-10">
-                {EDUCATION.map((edu, i) => (
-                  <div key={i} className="flex items-start gap-4">
-                    <div className="glass-icon-box">
-                      <Image src={edu.logo} alt={edu.name} width={28} height={28} className="object-contain w-full h-full" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-white/75 text-sm font-medium leading-snug">{edu.name}</p>
-                      <p className="text-white/38 text-xs mt-1.5">{edu.degree}</p>
-                      <p className="text-white/22 text-xs mt-1">{edu.years}</p>
-                    </div>
+              <div className="mb-6 lg:mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4 lg:mb-6">
+                  <div className="relative h-8 w-24 sm:h-12 sm:w-32 flex-shrink-0">
+                    <Image
+                      src="/assets/aupp.png"
+                      alt="American University of Phnom Penh Logo"
+                      fill
+                      className="object-contain object-left"
+                    />
                   </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Languages */}
-            <motion.div
-              className="glass bento-lang p-7 lg:p-9"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.45, delay: 0.07 }}
-            >
-              <p className="eyebrow mb-6">Languages</p>
-              <div className="flex flex-row lg:flex-col gap-3 flex-wrap relative z-10">
-                {LANGUAGES.map((lang) => (
-                  <div key={lang.name} className="glass-lang-item flex items-center gap-3">
-                    <Icon icon={lang.icon} width={20} height={20} style={{ color: lang.color }} />
-                    <span className="text-white/60 text-sm">{lang.name}</span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Tech Stack */}
-            <motion.div
-              id="techstack"
-              className="glass bento-stack p-7 lg:p-9"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.45, delay: 0.1 }}
-            >
-              <p className="eyebrow mb-6">Tech Stack</p>
-              <div className="space-y-5 relative z-10">
-                <div>
-                  <p className="text-white/18 text-[11px] tracking-[0.14em] uppercase mb-3">Frontend</p>
-                  <Marquee pauseOnHover className="[--duration:32s]" reverse>
-                    <FrontendIcons showLoading={false} loadingDelay={0} />
-                  </Marquee>
-                </div>
-                <div>
-                  <p className="text-white/18 text-[11px] tracking-[0.14em] uppercase mb-3">Backend</p>
-                  <Marquee pauseOnHover className="[--duration:48s]">
-                    <BackendIcons showLoading={false} loadingDelay={0} />
-                  </Marquee>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Contact */}
-            <motion.div
-              id="connect"
-              className="glass bento-cta overflow-hidden"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.45, delay: 0.13 }}
-            >
-              <div className="grid lg:grid-cols-[1fr_1.6fr] relative z-10">
-
-                {/* Info */}
-                <div className="p-7 lg:p-9 border-b lg:border-b-0 lg:border-r border-white/[0.06]">
-                  <p className="eyebrow mb-5">Connect</p>
-                  <h3 className="text-white text-xl lg:text-2xl font-semibold leading-tight mb-2">
-                    Let&apos;s build<br />something.
+                  <h3 className="text-lg lg:text-xl font-medium">
+                    American University of Phnom Penh
                   </h3>
-                  <p className="text-white/30 text-sm leading-relaxed mb-7">
-                    Open for freelance work and collaborations.
+                </div>
+                <div className="sm:ml-28 lg:ml-36 space-y-3">
+                  <p className="text-gray-300 text-base lg:text-lg">
+                    Bachelor of Science in Information Technology Management
                   </p>
-                  <div className="space-y-3 mb-7">
-                    <a href="tel:+85589980726" className="flex items-center gap-3 text-white/40 text-sm hover:text-white/70 transition-colors">
-                      <span className="glass-icon-sm"><Phone size={11} /></span>+855 89 980 726
-                    </a>
-                    <a href="mailto:p.varith@gmail.com" className="flex items-center gap-3 text-white/40 text-sm hover:text-white/70 transition-colors">
-                      <span className="glass-icon-sm"><Mail size={11} /></span>p.varith@gmail.com
-                    </a>
-                  </div>
-                  <div className="flex gap-2.5">
-                    {[
-                      { I: Send,     href: "https://t.me/Varith_Pheng",                           label: "Telegram" },
-                      { I: Linkedin, href: "https://www.linkedin.com/in/varith-pheng-85508a2ba/", label: "LinkedIn" },
-                      { I: Github,   href: "https://github.com/VarithPheng",                      label: "GitHub"   },
-                    ].map(({ I, href, label }) => (
-                      <a key={label} href={href} target="_blank" rel="noopener noreferrer" className="glass-social-btn" title={label}>
-                        <I size={14} />
-                      </a>
-                    ))}
-                  </div>
+                  <p className="text-gray-500 text-sm lg:text-base">
+                    2022 - Present
+                  </p>
                 </div>
-
-                {/* Form */}
-                <div className="p-7 lg:p-9">
-                  <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-                    <div className="grid lg:grid-cols-2 gap-4">
-                      <input type="text"  placeholder="Name"    className="glass-input" />
-                      <input type="email" placeholder="Email"   className="glass-input" />
-                    </div>
-                    <input type="text" placeholder="Subject" className="glass-input" />
-                    <textarea placeholder="Message" rows={5} className="glass-input resize-none" />
-                    <motion.button
-                      type="submit"
-                      className="btn-primary w-full"
-                      whileHover={{ scale: 1.01 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      Send Message
-                    </motion.button>
-                  </form>
-                </div>
-
               </div>
             </motion.div>
 
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              viewport={{ once: true }}
+              className="border border-gray-700 p-6 lg:p-8 rounded-lg bg-gray-900/20 hover:bg-gray-900/40 transition-colors"
+            >
+              <div className="mb-6 lg:mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4 lg:mb-6">
+                  <div className="relative h-8 w-24 sm:h-12 sm:w-32 flex-shrink-0">
+                    <Image
+                      src="/assets/fhsu.png"
+                      alt="Fort Hays State University Logo"
+                      fill
+                      className="object-contain object-left"
+                    />
+                  </div>
+                  <h3 className="text-lg lg:text-xl font-medium">
+                    Fort Hays State University
+                  </h3>
+                </div>
+                <div className="sm:ml-28 lg:ml-36 space-y-3">
+                  <p className="text-gray-300 text-base lg:text-lg">
+                    Bachelor of Science in Computer Science
+                  </p>
+                  <p className="text-gray-500 text-sm lg:text-base">
+                    2022 - Present
+                  </p>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ── Footer ───────────────────────────────────────────────────────────── */}
-      <footer className="pb-10">
-        <div className="w-full max-w-5xl mx-auto px-5 lg:px-8">
-          <div className="border-t border-white/[0.05] pt-6 flex flex-col lg:flex-row items-center justify-between gap-2">
-            <p className="text-white/[0.18] text-xs">© 2025 Varith PHENG. All rights reserved.</p>
-            <p className="text-white/[0.18] text-xs">Software Developer · Phnom Penh</p>
+      {/* Tech Stack Section */}
+      <section id="techstack" className="section">
+        <div className="container mx-auto">
+          {/* Programming Languages */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="mb-12 lg:mb-20"
+          >
+            <h2 className="mb-6 lg:mb-8">Programming Languages</h2>
+            <p className="text-gray-400 max-w-2xl mb-12 lg:mb-20">
+              Core programming languages I use for development.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-10">
+              {[
+                {
+                  name: "TypeScript",
+                  icon: "skill-icons:typescript",
+                  color: "#3178C6",
+                },
+                {
+                  name: "Python",
+                  icon: "skill-icons:python-dark",
+                  color: "#3776AB",
+                },
+                {
+                  name: "Java",
+                  icon: "skill-icons:java-dark",
+                  color: "#ED8B00",
+                },
+              ].map((lang, index) => (
+                <motion.div
+                  key={lang.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="skill-item group p-4 lg:p-6 border border-gray-700 rounded-lg bg-gray-900/20 hover:bg-gray-900/40 transition-colors"
+                >
+                  <div className="flex items-center gap-4 lg:gap-6">
+                    <Icon
+                      icon={lang.icon}
+                      width={32}
+                      height={32}
+                      className="text-gray-400 group-hover:text-white transition-colors flex-shrink-0 sm:w-10 sm:h-10"
+                      style={{ color: lang.color }}
+                    />
+                    <span className="text-lg lg:text-xl font-medium">
+                      {lang.name}
+                    </span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Tech Stack */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="mb-12 lg:mb-20"
+          >
+            <h2 className="mb-6 lg:mb-8">Tech Stack</h2>
+            <p className="text-gray-400 max-w-2xl mb-12 lg:mb-20">
+              Technologies and tools I use to build modern, scalable
+              applications.
+            </p>
+
+            <div className="space-y-8 lg:space-y-12">
+              {/* First Marquee Row - Right to Left */}
+              <Marquee
+                className="rounded-xl bg-gray-900/30 backdrop-blur-sm border border-gray-800/50 py-4 lg:py-6"
+                pauseOnHover={true}
+                reverse={true}
+                loadingDelay={800}
+              >
+                <FrontendIcons showLoading={false} loadingDelay={0} />
+              </Marquee>
+
+              {/* Second Marquee Row - Left to Right */}
+              <Marquee
+                className="rounded-xl bg-gray-900/30 backdrop-blur-sm border border-gray-800/50 py-4 lg:py-6"
+                pauseOnHover={true}
+                reverse={false}
+                loadingDelay={800}
+              >
+                <BackendIcons showLoading={false} loadingDelay={0} />
+              </Marquee>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Connect Section */}
+      <section id="connect" className="section section-alt">
+        <div className="container mx-auto">
+          <div className="grid-2">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="order-2 lg:order-1"
+            >
+              <h2 className="mb-8 lg:mb-12">Let&apos;s Connect</h2>
+
+              <div className="space-y-6 lg:space-y-8 mb-12 lg:mb-16">
+                <div className="flex items-center gap-4">
+                  <Phone size={18} className="text-gray-400 flex-shrink-0" />
+                  <span className="text-sm lg:text-base">+855 89 980 726</span>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <Mail size={18} className="text-gray-400 flex-shrink-0" />
+                  <span className="text-sm lg:text-base break-all">
+                    p.varith@gmail.com
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <a
+                  href="https://t.me/Varith_Pheng"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-gray-400 hover:text-white transition-colors"
+                >
+                  Telegram
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/varith-pheng-85508a2ba/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-gray-400 hover:text-white transition-colors"
+                >
+                  LinkedIn
+                </a>
+                <a
+                  href="https://github.com/VarithPheng"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-gray-400 hover:text-white transition-colors"
+                >
+                  GitHub
+                </a>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="order-1 lg:order-2 mb-8 lg:mb-0"
+            >
+              <form className="space-y-6 lg:space-y-8">
+                <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      className="form-input"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Subject"
+                    className="form-input"
+                  />
+                </div>
+
+                <div>
+                  <textarea
+                    placeholder="Message"
+                    className="form-textarea"
+                    required
+                  />
+                </div>
+
+                <motion.button
+                  type="submit"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="btn-primary w-full sm:w-auto"
+                >
+                  Send Message
+                </motion.button>
+              </form>
+            </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-8 lg:py-12 border-t border-gray-800">
+        <div className="container mx-auto text-center">
+          <p className="text-gray-400 text-xs lg:text-sm">
+            © 2025 Varith PHENG. All rights reserved.
+          </p>
         </div>
       </footer>
-
     </div>
   );
 }
