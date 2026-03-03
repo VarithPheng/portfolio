@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:ui.aceternity.com)",
+      "WebFetch(domain:magicui.design)",
+      "Bash(npx tsc --noEmit)",
+      "Bash(for cls in glass bento-edu bento-lang bento-stack bento-cta glass-pill glass-photo-frame glass-name-tag glass-icon-box glass-icon-sm glass-social-btn glass-lang-item glass-input eyebrow btn-primary btn-outline bento-grid)",
+      "Bash(do)",
+      "Bash(if grep -q \"\\\\.$cls\" /Users/tii/Desktop/portfolio/src/app/globals.css)",
+      "Bash(then)",
+      "Bash(echo \"✓ .$cls\")",
+      "Bash(else)",
+      "Bash(echo \"✗ .$cls — MISSING\")",
+      "Bash(fi)",
+      "Bash(done)"
+    ]
+  }
+}
