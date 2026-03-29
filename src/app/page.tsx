@@ -440,7 +440,7 @@ export default function Portfolio() {
                   download
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="btn-primary inline-flex items-center justify-center gap-3 text-center"
+                  className="btn-primary inline-flex items-center justify-center gap-3"
                 >
                   <Download size={16} />
                   Download CV
@@ -449,7 +449,7 @@ export default function Portfolio() {
                   onClick={() => scrollToSection("connect")}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="btn-secondary text-center"
+                  className="btn-secondary inline-flex items-center justify-center"
                 >
                   Get in touch
                 </motion.button>
