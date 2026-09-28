@@ -56,3 +56,21 @@ const section = (id: string) => (onHome ? `#${id}` : `/#${id}`);
   </nav>
 </header>
 
+
+<script>
+  // Scroll to in-page sections without putting "#section" in the address bar.
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  document.addEventListener("click", (event) => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const link = (event.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');
+    const target = link && document.getElementById(link.hash.slice(1));
+    if (!target) return;
+
+    event.preventDefault();
+    target.scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth" });
+    // Move keyboard focus to the section too, as a normal anchor jump would.
+    if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+    target.focus({ preventScroll: true });
+  });
+</script>
