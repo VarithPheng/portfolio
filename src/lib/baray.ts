@@ -1,8 +1,5 @@
-import crypto from "crypto";
-
-const sk = process.env.BARAY_SK!;
-const iv = process.env.BARAY_IV!;
-const apiKey = process.env.BARAY_API_KEY!;
+import crypto from "node:crypto";
+import { BARAY_API_KEY as apiKey, BARAY_IV as iv, BARAY_SK as sk } from "astro:env/server";
 
 export function encryptPayload(payload: Record<string, unknown>): string {
   const key = Buffer.from(sk, "base64");

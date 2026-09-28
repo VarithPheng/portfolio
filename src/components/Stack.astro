@@ -1,0 +1,23 @@
+---
+import { Icon } from "astro-icon/components";
+import { tools } from "@/data/profile";
+---
+
+<section id="stack" class="shell">
+  <div class="grid gap-10 border-t border-rule py-20 lg:grid-cols-12 lg:py-32">
+    <div class="lg:col-span-4">
+      <h2 class="heading">Tech I use</h2>
+    </div>
+
+    <ul class="grid grid-cols-2 gap-x-6 gap-y-5 text-lg text-paper lg:col-span-8 lg:grid-cols-3">
+      {
+        tools.map((t) => (
+          <li class="flex items-center gap-3">
+            <Icon name={t.icon} class="size-5 shrink-0 text-mute" aria-hidden="true" />
+            {t.name}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

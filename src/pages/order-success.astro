@@ -1,0 +1,29 @@
+---
+import Base from "@/layouts/Base.astro";
+---
+
+<Base title="Payment received · Varith Pheng" nav="store" noindex>
+  <section class="shell flex min-h-[70svh] flex-col justify-center py-24">
+    <h1 class="display text-[4rem] text-white lg:text-[7rem]">Payment received</h1>
+    <p class="mt-6 max-w-[44ch] text-lg text-mute">
+      Thank you. Your order is confirmed<span data-order hidden> as <span class="text-white tabular-nums"></span></span>.
+    </p>
+    <div class="mt-10 flex flex-wrap gap-3">
+      <a href="/store" class="btn btn-solid">Back to the store</a>
+      <a href="/" class="btn btn-line">Back to portfolio</a>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { clearCart } from "@/lib/cart";
+
+  clearCart();
+
+  const orderId = new URLSearchParams(location.search).get("order_id");
+  const wrap = document.querySelector<HTMLElement>("[data-order]");
+  if (orderId && wrap) {
+    wrap.querySelector("span")!.textContent = orderId;
+    wrap.hidden = false;
+  }
+</script>

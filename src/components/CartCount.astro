@@ -1,0 +1,10 @@
+<span class="tabular-nums" data-cart-count>(0)</span>
+
+<script>
+  import { cartCount } from "@/lib/cart";
+
+  const el = document.querySelector<HTMLElement>("[data-cart-count]");
+  cartCount.subscribe((n) => {
+    if (el) el.textContent = `(${n})`;
+  });
+</script>

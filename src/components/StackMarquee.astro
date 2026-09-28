@@ -1,0 +1,74 @@
+---
+import { Icon } from "astro-icon/components";
+import { tools } from "@/data/profile";
+
+// Two rows running in opposite directions so the full list is visible.
+const half = Math.ceil(tools.length / 2);
+const rows = [
+  { tools: tools.slice(0, half), reverse: false },
+  { tools: tools.slice(half), reverse: true },
+];
+---
+
+<div class="marquee border-y border-rule py-6 lg:py-8" aria-label="Tools I work with">
+  {
+    rows.map((row) => (
+      <div class:list={["track", row.reverse && "reverse"]}>
+        {[0, 1].map((copy) => (
+          <ul class="group" aria-hidden={copy === 1 ? "true" : undefined}>
+            {row.tools.map((t) => (
+              <li class="display flex items-center gap-3 text-2xl text-white lg:gap-4 lg:text-3xl">
+                <Icon name={t.icon} class="size-[0.6em] text-mute" aria-hidden="true" />
+                {t.name}
+              </li>
+            ))}
+          </ul>
+        ))}
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .marquee {
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+  .track {
+    display: flex;
+    width: max-content;
+    animation: scroll 50s linear infinite;
+  }
+  .track + .track {
+    margin-top: 1.25rem;
+  }
+  .reverse {
+    animation-direction: reverse;
+  }
+  .marquee:hover .track {
+    animation-play-state: paused;
+  }
+  .group {
+    display: flex;
+    gap: 3rem;
+    padding-right: 3rem;
+  }
+  @keyframes scroll {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  /* Static, scrollable row for people who turn off motion. */
+  @media (prefers-reduced-motion: reduce) {
+    .marquee {
+      overflow-x: auto;
+      mask-image: none;
+    }
+    .track {
+      animation: none;
+    }
+    .group[aria-hidden] {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,70 @@
+---
+import Base from "@/layouts/Base.astro";
+import { products } from "@/lib/products";
+import { formatPrice } from "@/lib/cart";
+---
+
+<Base title="Store · Varith Pheng" description="Cambodian goods, paid for with KHQR through Baray." nav="store" noindex>
+  <section class="shell pt-16 pb-12 lg:pt-24 lg:pb-16">
+    <h1 class="display text-[4.5rem] text-white lg:text-[8rem]">Store</h1>
+    <p class="mt-6 max-w-[48ch] text-lg text-mute">
+      Pepper from Kampot, coffee from Mondulkiri and handmade goods from across Cambodia. Pay with KHQR from any
+      Cambodian bank app.
+    </p>
+  </section>
+
+  <section class="shell pb-24 lg:pb-32" aria-label="Products">
+    <ul class="grid gap-x-8 gap-y-14 lg:grid-cols-3">
+      {
+        products.map((p) => (
+          <li class="flex flex-col">
+            <img
+              data-product-img
+              src={p.image}
+              alt=""
+              width="400"
+              height="400"
+              loading="lazy"
+              decoding="async"
+              class="aspect-square w-full rounded-md bg-panel object-cover"
+            />
+            <p class="mt-5 text-xs text-mute">{p.category}</p>
+            <h2 class="mt-1 text-lg font-semibold text-white">{p.name}</h2>
+            <p class="mt-2 flex-1 text-sm text-mute">{p.description}</p>
+            <div class="mt-5 flex items-center justify-between gap-4">
+              <span class="text-lg text-white tabular-nums">{formatPrice(p.price)}</span>
+              <button type="button" class="btn btn-line min-h-10 px-5" data-add={p.id}>
+                Add to cart
+              </button>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Base>
+
+<script>
+  import { addToCart } from "@/lib/cart";
+
+  // Leave an empty panel rather than a broken-image icon when a photo fails to load.
+  for (const img of document.querySelectorAll<HTMLImageElement>("[data-product-img]")) {
+    const hide = () => img.classList.add("invisible");
+    if (img.complete && img.naturalWidth === 0) hide();
+    else img.addEventListener("error", hide);
+  }
+
+  for (const btn of document.querySelectorAll<HTMLButtonElement>("[data-add]")) {
+    let timer: ReturnType<typeof setTimeout>;
+    btn.addEventListener("click", () => {
+      addToCart(btn.dataset.add!);
+      btn.textContent = "Added";
+      btn.classList.replace("btn-line", "btn-solid");
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        btn.textContent = "Add to cart";
+        btn.classList.replace("btn-solid", "btn-line");
+      }, 1200);
+    });
+  }
+</script>

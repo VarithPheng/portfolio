@@ -1,0 +1,138 @@
+---
+import Base from "@/layouts/Base.astro";
+---
+
+<Base title="Cart · Varith Pheng" nav="store" noindex>
+  <section class="shell min-h-[70svh] pt-16 pb-24 lg:pt-24 lg:pb-32">
+    <h1 class="display text-[4.5rem] text-white lg:text-[8rem]">Cart</h1>
+
+    <div data-empty hidden class="mt-10">
+      <p class="text-lg text-mute">Your cart is empty.</p>
+      <a href="/store" class="btn btn-solid mt-6">Browse the store</a>
+    </div>
+
+    <div data-filled hidden class="mt-10 grid gap-12 lg:grid-cols-12">
+      <ul data-lines class="divide-y divide-rule border-y border-rule lg:col-span-8"></ul>
+
+      <aside class="h-fit rounded-md border border-rule p-6 lg:sticky lg:top-24 lg:col-span-4">
+        <h2 class="text-sm text-mute">Order summary</h2>
+        <dl class="mt-5 space-y-2 text-sm">
+          <div class="flex justify-between">
+            <dt class="text-mute">Items</dt>
+            <dd class="tabular-nums" data-count></dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-mute">Delivery</dt>
+            <dd>Free</dd>
+          </div>
+        </dl>
+        <div class="mt-5 flex items-baseline justify-between border-t border-rule pt-5">
+          <span class="text-white">Total</span>
+          <span class="text-xl text-white tabular-nums" data-total></span>
+        </div>
+        <button type="button" class="btn btn-solid mt-6 w-full" data-pay>Pay with KHQR</button>
+        <p class="mt-3 text-xs text-mute">You'll finish payment on Baray with any Cambodian bank app.</p>
+        <p role="alert" class="mt-4 hidden rounded-md border border-rule p-3 text-sm text-white" data-error></p>
+      </aside>
+    </div>
+  </section>
+
+  <template data-line-template>
+    <li class="flex gap-4 py-5 lg:gap-6">
+      <span class="size-20 shrink-0 rounded-md bg-panel lg:size-24"><img alt="" width="96" height="96" class="size-20 shrink-0 rounded-md bg-panel object-cover lg:size-24" /></span>
+      <div class="flex min-w-0 flex-1 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div class="min-w-0">
+          <p class="font-semibold text-white" data-name></p>
+          <p class="text-sm text-mute tabular-nums" data-unit></p>
+        </div>
+        <div class="flex items-center justify-between gap-6">
+          <div class="flex items-center gap-3">
+            <button type="button" class="stepper" data-dec>−</button>
+            <span class="w-6 text-center tabular-nums" data-qty></span>
+            <button type="button" class="stepper" data-inc>+</button>
+          </div>
+          <div class="w-20 text-right">
+            <p class="text-white tabular-nums" data-line-total></p>
+            <button type="button" class="text-xs text-mute underline-offset-4 hover:text-white hover:underline" data-remove>
+              Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    </li>
+  </template>
+</Base>
+
+<script>
+  import { cartCount, cartLines, cartTotal, formatPrice, setQuantity } from "@/lib/cart";
+
+  const $ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) =>
+    root.querySelector<T>(sel)!;
+
+  const empty = $("[data-empty]");
+  const filled = $("[data-filled]");
+  const list = $("[data-lines]");
+  const template = $<HTMLTemplateElement>("[data-line-template]");
+  const payBtn = $<HTMLButtonElement>("[data-pay]");
+  const errorBox = $("[data-error]");
+
+  cartLines.subscribe((lines) => {
+    empty.hidden = lines.length > 0;
+    filled.hidden = lines.length === 0;
+
+    list.replaceChildren(
+      ...lines.map(({ product, quantity }) => {
+        const li = template.content.firstElementChild!.cloneNode(true) as HTMLLIElement;
+        const img = $<HTMLImageElement>("img", li);
+        img.addEventListener("error", () => img.classList.add("invisible"));
+        img.src = product.image;
+        $("[data-name]", li).textContent = product.name;
+        $("[data-unit]", li).textContent = `${formatPrice(product.price)} each`;
+        $("[data-qty]", li).textContent = String(quantity);
+        $("[data-line-total]", li).textContent = formatPrice(product.price * quantity);
+
+        const dec = $<HTMLButtonElement>("[data-dec]", li);
+        const inc = $<HTMLButtonElement>("[data-inc]", li);
+        dec.setAttribute("aria-label", `Remove one ${product.name}`);
+        inc.setAttribute("aria-label", `Add one ${product.name}`);
+        dec.onclick = () => setQuantity(product.id, quantity - 1);
+        inc.onclick = () => setQuantity(product.id, quantity + 1);
+        $<HTMLButtonElement>("[data-remove]", li).onclick = () => setQuantity(product.id, 0);
+        return li;
+      })
+    );
+  });
+
+  cartCount.subscribe((n) => ($("[data-count]").textContent = String(n)));
+  cartTotal.subscribe((t) => {
+    $("[data-total]").textContent = formatPrice(t);
+    payBtn.textContent = `Pay ${formatPrice(t)} with KHQR`;
+  });
+
+  payBtn.addEventListener("click", async () => {
+    payBtn.disabled = true;
+    const label = payBtn.textContent;
+    payBtn.textContent = "Opening Baray…";
+    errorBox.classList.add("hidden");
+
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: cartLines.get().map((l) => ({ id: l.product.id, quantity: l.quantity })),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Payment could not be created.");
+      window.location.href = data.payment_url;
+    } catch (err) {
+      errorBox.textContent = `Payment didn't start: ${
+        err instanceof Error ? err.message : "unknown error"
+      }. Try again in a moment.`;
+      errorBox.classList.remove("hidden");
+      payBtn.disabled = false;
+      payBtn.textContent = label;
+    }
+  });
+</script>

@@ -1,0 +1,57 @@
+---
+import { Image } from "astro:assets";
+import { Icon } from "astro-icon/components";
+import portrait from "@/assets/varith.jpg";
+import { contact } from "@/data/profile";
+---
+
+<section class="shell grid gap-10 pt-12 pb-16 lg:grid-cols-12 lg:items-end lg:gap-10 lg:pt-24 lg:pb-24">
+  <div class="lg:col-span-8">
+    <h1 class="display text-[15vw] text-white lg:text-[7.5rem]">Software developer in Phnom Penh.</h1>
+    <p class="mt-8 max-w-[40ch] text-lg text-paper lg:text-xl">
+      I build web apps and APIs with TypeScript while studying computer science and IT
+      management.
+    </p>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href="/assets/cv.pdf" class="btn btn-solid">
+        <Icon name="lucide:file-text" class="size-4" aria-hidden="true" />
+        View CV
+      </a>
+      <a href={`mailto:${contact.email}`} class="btn btn-line">Email me</a>
+    </div>
+  </div>
+
+  <figure class="flex items-end gap-5 lg:col-span-4 lg:flex-col lg:items-stretch">
+    <Image
+      src={portrait}
+      alt="Portrait of Varith Pheng"
+      width={640}
+      widths={[240, 640]}
+      sizes="(min-width: 1024px) 300px, 112px"
+      class="aspect-[3/4] w-28 rounded-sm object-cover lg:w-full"
+      loading="eager"
+    />
+    <figcaption class="text-sm text-mute">
+      Phnom Penh, UTC+7<br />
+      <time class="invisible text-xl text-white tabular-nums" data-clock>00:00:00</time>
+    </figcaption>
+  </figure>
+</section>
+
+
+<script>
+  const clock = document.querySelector<HTMLTimeElement>("[data-clock]");
+  const fmt = new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Phnom_Penh",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+  const tick = () => {
+    if (clock) clock.textContent = fmt.format(new Date());
+  };
+  tick();
+  clock?.classList.remove("invisible");
+  setInterval(tick, 1000);
+</script>
