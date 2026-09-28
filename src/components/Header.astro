@@ -1,0 +1,58 @@
+---
+import CartCount from "./CartCount.astro";
+
+interface Props {
+  nav: "home" | "store";
+}
+
+const { nav } = Astro.props;
+const onHome = Astro.url.pathname === "/";
+const section = (id: string) => (onHome ? `#${id}` : `/#${id}`);
+---
+
+<header class="sticky top-0 z-40 border-b border-rule/60 bg-ink/85 backdrop-blur-md">
+  <nav class="shell flex h-16 items-center justify-between gap-6" aria-label="Main">
+    <a href="/" class="display text-xl text-white">Varith Pheng</a>
+
+    <ul class="flex items-center gap-5 text-sm text-mute lg:gap-8">
+      {
+        nav === "home" ? (
+          <>
+            <li class="hidden lg:block">
+              <a class="transition-colors hover:text-white" href={section("projects")}>Projects</a>
+            </li>
+            <li class="hidden lg:block">
+              <a class="transition-colors hover:text-white" href={section("education")}>Education</a>
+            </li>
+            <li class="hidden lg:block">
+              <a class="transition-colors hover:text-white" href={section("stack")}>Tech</a>
+            </li>
+            <li>
+              <a class="transition-colors hover:text-white" href={section("contact")}>Contact</a>
+            </li>
+          </>
+        ) : (
+          <>
+            <li>
+              <a
+                class:list={["transition-colors hover:text-white", Astro.url.pathname === "/store" && "text-white"]}
+                href="/store"
+              >
+                Store
+              </a>
+            </li>
+            <li>
+              <a
+                class:list={["transition-colors hover:text-white", Astro.url.pathname === "/cart" && "text-white"]}
+                href="/cart"
+              >
+                Cart <CartCount />
+              </a>
+            </li>
+          </>
+        )
+      }
+    </ul>
+  </nav>
+</header>
+

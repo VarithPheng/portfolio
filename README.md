@@ -1,36 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Varith Pheng — portfolio
 
-## Getting Started
+Personal site and a small Cambodian goods store, built with [Astro](https://astro.build) and Tailwind CSS v4.
+Payments go through [Baray](https://baray.io) (KHQR).
 
-First, run the development server:
+## Develop
+
+Requires Node 22.12+ (`nvm use` picks it up from `.nvmrc`).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun install
+bun run dev      # http://localhost:4321
+bun run check    # type-check .astro and .ts files
+bun run build    # output in .vercel/output
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Set in `.env.local` (or in your Vercel project settings):
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable        | Purpose                                                        |
+| --------------- | -------------------------------------------------------------- |
+| `BARAY_API_KEY` | Baray API key                                                  |
+| `BARAY_SK`      | Baray AES key (base64)                                         |
+| `BARAY_IV`      | Baray AES IV (base64)                                          |
+| `SITE_URL`      | Optional. Public origin for the payment success redirect. Defaults to the request origin. |
 
-## Learn More
+## Structure
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/pages/` — `index`, `store`, `cart`, `order-success`, plus `api/checkout` and `api/webhook/baray` (rendered on demand)
+- `src/components/` — home page sections and header/footer
+- `src/data/profile.ts` — contact details, education and stack
+- `src/lib/products.ts` — store catalog (the checkout API prices orders from this, not from the client)
+- `src/lib/cart.ts` — cart state, persisted to `localStorage` with nanostores
+- `src/styles/global.css` — design tokens and shared classes

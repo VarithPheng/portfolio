@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+/*
+  Monochrome, one family (Archivo) with its width axis doing the work:
+  62% width for display, 100% for reading.
+*/
+@theme {
+  --color-ink: #000000;
+  --color-panel: #141414;
+  --color-rule: #2a2a2a;
+  --color-mute: #8f8f8f;
+  --color-paper: #ececec;
+  --color-white: #ffffff;
+
+  --font-sans: "Archivo Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Classic scale: 13 / 15 / 17 / 21 / 28 / 40 / 60 */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.4;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.6;
+  --text-lg: 1.3125rem;
+  --text-lg--line-height: 1.45;
+  --text-xl: 1.75rem;
+  --text-xl--line-height: 1.2;
+  --text-2xl: 2.5rem;
+  --text-2xl--line-height: 1.05;
+  --text-3xl: 3.75rem;
+  --text-3xl--line-height: 1;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    background: var(--color-ink);
+    scroll-padding-top: 5rem;
+  }
+
+  html.js:not(.fonts-ready) body {
+    visibility: hidden;
+  }
+
+  body {
+    @apply bg-ink text-paper font-sans text-base antialiased;
+    font-stretch: 100%;
+    font-feature-settings: "ss01", "tnum";
+    overflow-x: hidden;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-white);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--color-white);
+    color: var(--color-ink);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html:focus-within {
+      scroll-behavior: smooth;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-delay: 0s !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Condensed display type: the one loud voice on the page. */
+  .display {
+    font-stretch: 62%;
+    font-weight: 850;
+    letter-spacing: -0.02em;
+    line-height: 0.86;
+  }
+
+  .heading {
+    font-stretch: 62%;
+    font-weight: 750;
+    font-size: var(--text-2xl);
+    line-height: var(--text-2xl--line-height);
+    letter-spacing: -0.01em;
+    color: var(--color-white);
+  }
+
+  .shell {
+    @apply mx-auto w-full max-w-6xl px-5 lg:px-16;
+  }
+
+  .btn {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition-colors;
+  }
+  /* Use as `btn btn-solid` / `btn btn-line`. */
+  .btn-solid {
+    @apply bg-white text-ink hover:bg-paper;
+  }
+  .btn-line {
+    @apply border border-rule text-white hover:border-mute;
+  }
+  .btn:disabled {
+    @apply cursor-not-allowed opacity-50;
+  }
+
+  .link {
+    @apply underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:decoration-white;
+  }
+
+  .stepper {
+    @apply inline-flex size-9 items-center justify-center rounded-full border border-rule text-paper transition-colors hover:border-mute;
+  }
+}
