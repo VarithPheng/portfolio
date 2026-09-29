@@ -4,51 +4,55 @@ import { contact } from "@/data/profile";
 ---
 
 <section id="contact" class="shell">
-<div class="border-t border-rule py-20 lg:py-32">
-  <h2 class="heading">Contact</h2>
-  <p class="mt-4 max-w-[40ch] text-mute">Have a project, a role or a question? Send me an email.</p>
+  <div class="py-12 lg:py-20">
+    <h2 class="heading">Contact</h2>
+    <p class="mt-4 max-w-[40ch] text-mute">
+      Have a project, a role or a question? Send me an email.
+    </p>
 
-  <a
-    href={`mailto:${contact.email}`}
-    class="display mt-10 block text-[12.5vw] text-white transition-colors hover:text-paper lg:text-[min(10vw,8.5rem)]"
-  >
-    {contact.email}
-  </a>
+    <a
+      class="display mt-10 block text-[12.5vw] text-white transition-colors hover:text-paper lg:text-[min(10vw,8.5rem)]"
+    >
+      {contact.email}
+    </a>
 
-  <button type="button" class="btn btn-line mt-8" data-copy={contact.email}>
-    <Icon name="lucide:copy" class="size-4" aria-hidden="true" data-icon-idle />
-    <Icon name="lucide:check" class="hidden size-4" aria-hidden="true" data-icon-done />
-    <span data-copy-label>Copy email</span>
-  </button>
+    <button type="button" class="btn btn-line mt-8" data-copy={contact.email}>
+      <Icon
+        name="lucide:copy"
+        class="size-4"
+        aria-hidden="true"
+        data-icon-idle
+      />
+      <Icon
+        name="lucide:check"
+        class="hidden size-4"
+        aria-hidden="true"
+        data-icon-done
+      />
+      <span data-copy-label>Copy email</span>
+    </button>
 
-  <ul class="mt-16 grid gap-px overflow-hidden rounded-md border border-rule bg-rule lg:grid-cols-4">
-    <li>
-      <a href={`tel:${contact.phone.replaceAll(" ", "")}`} class="flex h-full flex-col gap-1 bg-ink p-5 transition-colors hover:bg-panel">
-        <span class="inline-flex items-center gap-2 text-sm text-mute">
-          <Icon name="lucide:phone" class="size-4" aria-hidden="true" /> Phone
-        </span>
-        <span class="text-white tabular-nums">{contact.phone}</span>
-      </a>
-    </li>
-    {
-      contact.links.map((l) => (
-        <li>
-          <a
-            href={l.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="flex h-full flex-col gap-1 bg-ink p-5 transition-colors hover:bg-panel"
-          >
-            <span class="inline-flex items-center gap-2 text-sm text-mute">
-              <Icon name={l.icon} class="size-4" aria-hidden="true" /> {l.label}
-            </span>
-            <span class="text-white">{l.handle}</span>
-          </a>
-        </li>
-      ))
-    }
-  </ul>
-</div>
+    <ul class="mt-16 grid gap-3 lg:grid-cols-3">
+      {
+        contact.links.map((l) => (
+          <li>
+            <a
+              href={l.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="glass flex h-full flex-col gap-1 rounded-2xl p-5 transition-colors hover:bg-white/10"
+            >
+              <span class="inline-flex items-center gap-2 text-sm text-mute">
+                <Icon name={l.icon} class="size-4" aria-hidden="true" />{" "}
+                {l.label}
+              </span>
+              <span class="text-white">{l.handle}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
 </section>
 
 <script>

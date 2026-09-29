@@ -2,7 +2,8 @@
 import { Icon } from "astro-icon/components";
 import { tools } from "@/data/profile";
 
-// Two rows running in opposite directions so the full list is visible.
+// Two rows of logos running in opposite directions. A row of logos is narrower than the
+// box, so each row is rendered four times; scrolling by half keeps the loop seamless.
 const half = Math.ceil(tools.length / 2);
 const rows = [
   { tools: tools.slice(0, half), reverse: false },
@@ -10,16 +11,17 @@ const rows = [
 ];
 ---
 
-<div class="marquee border-y border-rule py-6 lg:py-8" aria-label="Tools I work with">
+<div class="shell">
+<div class="glass overflow-hidden rounded-3xl py-6 lg:py-8">
+<div class="marquee" aria-hidden="true">
   {
     rows.map((row) => (
       <div class:list={["track", row.reverse && "reverse"]}>
-        {[0, 1].map((copy) => (
-          <ul class="group" aria-hidden={copy === 1 ? "true" : undefined}>
+        {[0, 1, 2, 3].map(() => (
+          <ul class="group">
             {row.tools.map((t) => (
-              <li class="display flex items-center gap-3 text-2xl text-white lg:gap-4 lg:text-3xl">
-                <Icon name={t.icon} class="size-[0.6em] text-mute" aria-hidden="true" />
-                {t.name}
+              <li title={t.name}>
+                <Icon name={t.icon} class="size-10 text-white/85 lg:size-12" />
               </li>
             ))}
           </ul>
@@ -27,6 +29,8 @@ const rows = [
       </div>
     ))
   }
+</div>
+</div>
 </div>
 
 <style>
@@ -37,10 +41,10 @@ const rows = [
   .track {
     display: flex;
     width: max-content;
-    animation: scroll 50s linear infinite;
+    animation: scroll 40s linear infinite;
   }
   .track + .track {
-    margin-top: 1.25rem;
+    margin-top: 1.75rem;
   }
   .reverse {
     animation-direction: reverse;
@@ -50,8 +54,8 @@ const rows = [
   }
   .group {
     display: flex;
-    gap: 3rem;
-    padding-right: 3rem;
+    gap: 3.5rem;
+    padding-right: 3.5rem;
   }
   @keyframes scroll {
     to {
@@ -67,7 +71,7 @@ const rows = [
     .track {
       animation: none;
     }
-    .group[aria-hidden] {
+    .group + .group {
       display: none;
     }
   }

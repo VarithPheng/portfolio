@@ -4,27 +4,21 @@ import { education } from "@/data/profile";
 ---
 
 <section id="education" class="shell">
-  <div class="border-t border-rule py-20 lg:py-32">
-    <div>
+  <div class="grid gap-10 pt-12 lg:grid-cols-12 lg:pt-20">
+    <div class="lg:col-span-4">
       <h2 class="heading">Education</h2>
     </div>
 
-    <ul class="mt-10 divide-y divide-rule lg:mt-14">
+    <ul class="glass divide-y divide-white/10 rounded-3xl px-6 py-2 lg:col-span-8 lg:px-10 lg:py-4">
       {
         education.map((e) => (
-          <li class="flex items-center gap-5 py-6 first:pt-0 last:pb-0 lg:gap-8">
-            <div class="shrink-0 rounded-md bg-white px-3 py-2 lg:px-4 lg:py-3">
-              <Image
-                src={e.logo}
-                alt={e.school}
-                height={48}
-                densities={[1, 2]}
-                class="h-7 w-auto grayscale lg:h-10"
-              />
+          <li class="flex flex-col items-start gap-4 py-5 lg:flex-row lg:items-center lg:gap-6 lg:py-6">
+            <div class="shrink-0 rounded-xl bg-white px-3 py-2">
+              <Image src={e.logo} alt={e.school} height={40} densities={[1, 2]} class="h-7 w-auto grayscale lg:h-8" />
             </div>
-            <div class="min-w-0 flex-1 lg:flex lg:items-center lg:justify-between lg:gap-8">
+            <div class="min-w-0">
               <p class="text-white">{e.degree}</p>
-              <p class="text-sm whitespace-nowrap text-mute">{e.years}</p>
+              <p class="mt-0.5 text-sm text-mute">{e.years}</p>
             </div>
           </li>
         ))

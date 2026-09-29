@@ -14,10 +14,10 @@ import { formatPrice } from "@/lib/cart";
   </section>
 
   <section class="shell pb-24 lg:pb-32" aria-label="Products">
-    <ul class="grid gap-x-8 gap-y-14 lg:grid-cols-3">
+    <ul class="grid gap-6 lg:grid-cols-3">
       {
         products.map((p) => (
-          <li class="flex flex-col">
+          <li class="glass flex flex-col rounded-3xl p-3 pb-5">
             <img
               data-product-img
               src={p.image}
@@ -26,12 +26,12 @@ import { formatPrice } from "@/lib/cart";
               height="400"
               loading="lazy"
               decoding="async"
-              class="aspect-square w-full rounded-md bg-panel object-cover"
+              class="aspect-square w-full rounded-2xl bg-white/5 object-cover"
             />
-            <p class="mt-5 text-xs text-mute">{p.category}</p>
-            <h2 class="mt-1 text-lg font-semibold text-white">{p.name}</h2>
-            <p class="mt-2 flex-1 text-sm text-mute">{p.description}</p>
-            <div class="mt-5 flex items-center justify-between gap-4">
+            <p class="mt-5 px-2 text-xs text-mute">{p.category}</p>
+            <h2 class="mt-1 px-2 text-lg font-semibold text-white">{p.name}</h2>
+            <p class="mt-2 flex-1 px-2 text-sm text-mute">{p.description}</p>
+            <div class="mt-5 flex items-center justify-between gap-4 px-2">
               <span class="text-lg text-white tabular-nums">{formatPrice(p.price)}</span>
               <button type="button" class="btn btn-line min-h-10 px-5" data-add={p.id}>
                 Add to cart

@@ -5,12 +5,16 @@ import portrait from "@/assets/varith.jpg";
 import { contact } from "@/data/profile";
 ---
 
-<section class="shell grid gap-10 pt-12 pb-16 lg:grid-cols-12 lg:items-end lg:gap-10 lg:pt-24 lg:pb-24">
+<section
+  class="shell grid gap-10 pt-12 pb-12 lg:grid-cols-12 lg:items-end lg:gap-10 lg:pt-24 lg:pb-20"
+>
   <div class="lg:col-span-8">
-    <h1 class="display text-[15vw] text-white lg:text-[7.5rem]">Software developer in Phnom Penh.</h1>
+    <h1 class="display text-[15vw] text-white lg:text-[7.5rem]">
+      Software dev.
+    </h1>
     <p class="mt-8 max-w-[40ch] text-lg text-paper lg:text-xl">
-      I build web apps and APIs with TypeScript while studying computer science and IT
-      management.
+      I build web apps and turn real-world ideas into working products,
+      including integrations with local banking and payment systems.
     </p>
     <div class="mt-8 flex flex-wrap gap-3">
       <a href="/assets/cv.pdf" class="btn btn-solid">
@@ -21,23 +25,24 @@ import { contact } from "@/data/profile";
     </div>
   </div>
 
-  <figure class="flex flex-col gap-4 lg:col-span-4">
+  <figure class="glass flex flex-col gap-4 rounded-3xl p-2 pb-4 lg:col-span-4">
     <Image
       src={portrait}
       alt="Portrait of Varith Pheng"
       width={800}
       widths={[480, 800]}
       sizes="(min-width: 1024px) 300px, 100vw"
-      class="aspect-[4/5] w-full rounded-sm object-cover lg:aspect-[3/4]"
+      class="aspect-[4/5] w-full rounded-2xl object-cover lg:aspect-[3/4]"
       loading="eager"
     />
-    <figcaption class="text-sm text-mute">
+    <figcaption class="px-3 text-sm text-mute">
       Phnom Penh, UTC+7<br />
-      <time class="invisible text-xl text-white tabular-nums" data-clock>00:00:00</time>
+      <time class="invisible text-xl text-white tabular-nums" data-clock
+        >00:00:00</time
+      >
     </figcaption>
   </figure>
 </section>
-
 
 <script>
   const clock = document.querySelector<HTMLTimeElement>("[data-clock]");
