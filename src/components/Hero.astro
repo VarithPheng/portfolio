@@ -5,43 +5,45 @@ import portrait from "@/assets/varith.jpg";
 import { contact } from "@/data/profile";
 ---
 
-<section
-  class="shell grid gap-10 pt-12 pb-12 lg:grid-cols-12 lg:items-end lg:gap-10 lg:pt-24 lg:pb-20"
->
-  <div class="lg:col-span-8">
-    <h1 class="display text-[15vw] text-white lg:text-[7.5rem]">
-      Software dev.
+<section class="shell pt-10 pb-12 lg:pt-20 lg:pb-20">
+  <div class="flex items-end justify-between gap-4 lg:gap-10">
+    <h1 class="display text-[17vw] text-white lg:text-[10rem]">
+      Software<br />dev.
     </h1>
-    <p class="mt-8 max-w-[40ch] text-lg text-paper lg:text-xl">
-      I build web apps and turn real-world ideas into working products,
-      including integrations with local banking and payment systems.
-    </p>
-    <div class="mt-8 flex flex-wrap gap-3">
-      <a href="/assets/cv.pdf" class="btn btn-solid">
-        <Icon name="lucide:file-text" class="size-4" aria-hidden="true" />
-        View CV
-      </a>
-      <a href={`mailto:${contact.email}`} class="btn btn-line">Email me</a>
+
+    <div class="glass shrink-0 rounded-[1.25rem] p-1.5 lg:rounded-[1.75rem] lg:p-2">
+      <Image
+        src={portrait}
+        alt="Portrait of Varith Pheng"
+        width={520}
+        widths={[240, 520]}
+        sizes="(min-width: 1024px) 208px, 96px"
+        class="aspect-[4/5] w-24 rounded-[0.875rem] object-cover lg:w-52 lg:rounded-[1.25rem]"
+        loading="eager"
+      />
     </div>
   </div>
 
-  <figure class="glass flex flex-col gap-4 rounded-3xl p-2 pb-4 lg:col-span-4">
-    <Image
-      src={portrait}
-      alt="Portrait of Varith Pheng"
-      width={800}
-      widths={[480, 800]}
-      sizes="(min-width: 1024px) 300px, 100vw"
-      class="aspect-[4/5] w-full rounded-2xl object-cover lg:aspect-[3/4]"
-      loading="eager"
-    />
-    <figcaption class="px-3 text-sm text-mute">
+  <div class="mt-10 grid gap-8 border-t border-white/10 pt-8 lg:mt-14 lg:grid-cols-12 lg:items-end lg:gap-10 lg:pt-10">
+    <div class="lg:col-span-8">
+      <p class="max-w-[52ch] text-lg text-paper lg:text-xl">
+        I build web apps and turn real-world ideas into working products,
+        including integrations with local banking and payment systems.
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="/assets/cv.pdf" class="btn btn-solid">
+          <Icon name="lucide:file-text" class="size-4" aria-hidden="true" />
+          View CV
+        </a>
+        <a href={`mailto:${contact.email}`} class="btn btn-line">Email me</a>
+      </div>
+    </div>
+
+    <p class="text-sm text-mute lg:col-span-4 lg:text-right">
       Phnom Penh, UTC+7<br />
-      <time class="invisible text-xl text-white tabular-nums" data-clock
-        >00:00:00</time
-      >
-    </figcaption>
-  </figure>
+      <time class="invisible text-xl text-white tabular-nums" data-clock>00:00:00</time>
+    </p>
+  </div>
 </section>
 
 <script>

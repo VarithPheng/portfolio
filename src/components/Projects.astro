@@ -11,12 +11,11 @@ const github = contact.links.find((l) => l.label === "GitHub")!;
       <h2 class="heading">Projects</h2>
     </div>
 
-    <div class="glass rounded-3xl p-8 lg:col-span-8 lg:p-12">
-      <p class="display text-3xl text-white lg:text-[5.5rem]">Coming soon</p>
-      <p class="mt-5 max-w-[44ch] text-mute">
-        I'm writing up case studies for the things I've built. Until they're here, you can browse my code on GitHub.
+    <div class="flex flex-col items-start gap-5 border-y border-white/10 py-6 lg:col-span-8 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+      <p class="max-w-[44ch] text-lg text-paper">
+        Case studies are on the way. Until then, my code is on GitHub.
       </p>
-      <a href={github.href} target="_blank" rel="noopener noreferrer" class="btn btn-line mt-8">
+      <a href={github.href} target="_blank" rel="noopener noreferrer" class="btn btn-line shrink-0">
         <Icon name={github.icon} class="size-4" aria-hidden="true" />
         View GitHub
       </a>

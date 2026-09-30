@@ -19,13 +19,13 @@ const section = (id: string) => (onHome ? `#${id}` : `/#${id}`);
         nav === "home" ? (
           <>
             <li class="hidden lg:block">
-              <a class="block rounded-full px-3 py-2 transition-colors hover:bg-white/10 hover:text-white lg:px-4" href={section("projects")}>Projects</a>
-            </li>
-            <li class="hidden lg:block">
               <a class="block rounded-full px-3 py-2 transition-colors hover:bg-white/10 hover:text-white lg:px-4" href={section("education")}>Education</a>
             </li>
             <li class="hidden lg:block">
               <a class="block rounded-full px-3 py-2 transition-colors hover:bg-white/10 hover:text-white lg:px-4" href={section("stack")}>Tech</a>
+            </li>
+            <li class="hidden lg:block">
+              <a class="block rounded-full px-3 py-2 transition-colors hover:bg-white/10 hover:text-white lg:px-4" href={section("projects")}>Projects</a>
             </li>
             <li>
               <a class="block rounded-full px-3 py-2 transition-colors hover:bg-white/10 hover:text-white lg:px-4" href={section("contact")}>Contact</a>
