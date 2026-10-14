@@ -5,7 +5,7 @@ import portrait from "@/assets/varith.jpg";
 import { contact } from "@/data/profile";
 ---
 
-<section class="shell pt-10 pb-12 lg:pt-20 lg:pb-20">
+<section id="top" class="pt-10 lg:pt-20">
   <div class="flex items-end justify-between gap-4 lg:gap-10">
     <h1 class="display text-[17vw] text-white lg:text-[10rem]">
       Software<br />dev.
@@ -24,41 +24,17 @@ import { contact } from "@/data/profile";
     </div>
   </div>
 
-  <div class="mt-10 grid gap-8 border-t border-white/10 pt-8 lg:mt-14 lg:grid-cols-12 lg:items-end lg:gap-10 lg:pt-10">
-    <div class="lg:col-span-8">
-      <p class="max-w-[52ch] text-lg text-paper lg:text-xl">
-        I build web apps and turn real-world ideas into working products,
-        including integrations with local banking and payment systems.
-      </p>
-      <div class="mt-8 flex flex-wrap gap-3">
-        <a href="/assets/cv.pdf" class="btn btn-solid">
-          <Icon name="lucide:file-text" class="size-4" aria-hidden="true" />
-          View CV
-        </a>
-        <a href={`mailto:${contact.email}`} class="btn btn-line">Email me</a>
-      </div>
-    </div>
-
-    <p class="text-sm text-mute lg:col-span-4 lg:text-right">
-      Phnom Penh, UTC+7<br />
-      <time class="invisible text-xl text-white tabular-nums" data-clock>00:00:00</time>
+  <div class="mt-10 border-t border-white/10 pt-8 lg:mt-14 lg:pt-10">
+    <p class="max-w-[52ch] text-lg text-paper lg:text-xl">
+      I build web apps and turn real-world ideas into working products,
+      including integrations with local banking and payment systems.
     </p>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <a href="/assets/cv.pdf" class="btn btn-solid">
+        <Icon name="lucide:file-text" class="size-4" aria-hidden="true" />
+        View CV
+      </a>
+      <a href={`mailto:${contact.email}`} class="btn btn-line">Email me</a>
+    </div>
   </div>
 </section>
-
-<script>
-  const clock = document.querySelector<HTMLTimeElement>("[data-clock]");
-  const fmt = new Intl.DateTimeFormat("en-GB", {
-    timeZone: "Asia/Phnom_Penh",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  });
-  const tick = () => {
-    if (clock) clock.textContent = fmt.format(new Date());
-  };
-  tick();
-  clock?.classList.remove("invisible");
-  setInterval(tick, 1000);
-</script>

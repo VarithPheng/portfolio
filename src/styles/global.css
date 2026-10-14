@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 /*
-  Monochrome, one family (Archivo) with its width axis doing the work:
-  62% width for display, 100% for reading.
+  Monochrome, terminal-flavoured. Two variable families, both with a width axis:
+  Archivo (62% for display, 100% for reading) and Martian Mono (condensed, for interface chrome).
 */
 @theme {
   --color-ink: #000000;
@@ -13,6 +13,7 @@
   --color-white: #ffffff;
 
   --font-sans: "Archivo Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "Martian Mono Variable", ui-monospace, "SF Mono", Menlo, monospace;
 
   /* Classic scale: 13 / 15 / 17 / 21 / 28 / 40 / 60 */
   --text-xs: 0.8125rem;
@@ -98,6 +99,15 @@
     line-height: var(--text-2xl--line-height);
     letter-spacing: -0.01em;
     color: var(--color-white);
+  }
+
+  /* Interface chrome: pane titles, the status bar, meta labels. */
+  .mono {
+    font-family: var(--font-mono);
+    font-stretch: 87.5%;
+    font-size: 0.75rem;
+    line-height: 1.6;
+    letter-spacing: 0;
   }
 
   .shell {

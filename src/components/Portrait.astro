@@ -1,0 +1,59 @@
+---
+import sharp from "sharp";
+import path from "node:path";
+import { Image } from "astro:assets";
+import portrait from "@/assets/varith.jpg";
+
+// The portrait drawn as ASCII at build time, so it costs no JavaScript. Darker pixels get denser characters;
+// the gamma curve thins out the bright wall behind me so the figure stands out.
+const COLS = 56;
+const crop = { left: 420, top: 420, width: 1400, height: 2150 };
+const rows = Math.round(COLS * (crop.height / crop.width) * 0.5);
+// Resolved from the project root: once bundled, import.meta.url no longer points into src/.
+const file = path.join(process.cwd(), "src/assets/varith.jpg");
+const { data } = await sharp(file)
+  .extract(crop)
+  .greyscale()
+  .normalise()
+  .resize(COLS, rows, { fit: "fill" })
+  .raw()
+  .toBuffer({ resolveWithObject: true });
+
+const ramp = " .:-=+*#%@";
+let ascii = "";
+for (let y = 0; y < rows; y++) {
+  for (let x = 0; x < COLS; x++) {
+    const density = Math.pow(1 - data[y * COLS + x] / 255, 1.6);
+    ascii += ramp[Math.min(ramp.length - 1, Math.floor(density * ramp.length))];
+  }
+  ascii += "\n";
+}
+---
+
+<figure class="portrait group relative overflow-hidden" style={`--cols: ${COLS}`}>
+  <pre class="text-white/80 select-none" aria-hidden="true">{ascii}</pre>
+  <Image
+    src={portrait}
+    alt="Portrait of Varith Pheng"
+    width={520}
+    widths={[320, 520]}
+    sizes="(min-width: 1024px) 340px, 90vw"
+    class="absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+    style={`object-position: ${((crop.left + crop.width / 2) / 2038) * 100}% ${((crop.top + crop.height / 2) / 2717) * 100}%`}
+    loading="eager"
+  />
+</figure>
+
+<style>
+  .portrait {
+    container-type: inline-size;
+  }
+  pre {
+    margin: 0;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    /* Fit exactly COLS characters across; a monospace glyph is about 0.6em wide. */
+    font-size: calc(100cqi / var(--cols) / 0.6);
+    line-height: 1.2;
+    letter-spacing: 0;
+  }
+</style>

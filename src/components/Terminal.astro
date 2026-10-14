@@ -1,0 +1,318 @@
+---
+// A small terminal modelled on the Claude Code interface. Sits inside a Pane: a welcome box, a "> " prompt,
+// a slash-command menu, and replies marked with ⏺ and ⎿.
+---
+
+<div class="term" data-term>
+  <div class="flex items-center gap-3 rounded-xl border border-white/15 px-4 py-3">
+    <span class="text-lg text-white" aria-hidden="true">✻</span>
+    <div>
+      <p class="text-white">Welcome to Varith's terminal</p>
+      <p class="text-mute">Type <kbd>/</kbd> for commands, or try <button type="button" class="cmd-hint" data-run="/work">/work</button></p>
+    </div>
+  </div>
+
+  <div class="log mt-3 h-44 overflow-y-auto pr-1 lg:h-48" role="log" aria-live="polite" data-log></div>
+
+  <form class="relative mt-3" data-form autocomplete="off">
+    <ul class="menu absolute inset-x-0 bottom-full mb-2 hidden overflow-hidden rounded-xl border border-white/15 bg-[#0a0a0a] py-1.5" role="listbox" id="term-menu" data-menu></ul>
+    <label class="flex items-center gap-2 rounded-xl border border-white/25 px-4 py-3 focus-within:border-white/60">
+      <span class="text-white" aria-hidden="true">&gt;</span>
+      <span class="sr-only">Command</span>
+      <input
+        class="min-w-0 flex-1 bg-transparent text-white caret-white outline-none placeholder:text-mute"
+        placeholder='Try "/help"'
+        spellcheck="false"
+        autocapitalize="off"
+        role="combobox"
+        aria-controls="term-menu"
+        aria-expanded="false"
+        data-input
+      />
+    </label>
+  </form>
+  <p class="mt-2 flex flex-wrap gap-x-4 px-1 text-mute"><span>↑↓ history</span><span>tab to complete</span><span>esc to clear</span></p>
+</div>
+
+<style>
+  .term {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+  }
+  .term kbd,
+  .cmd-hint {
+    color: var(--color-white);
+    font: inherit;
+  }
+  .cmd-hint {
+    text-decoration: underline;
+    text-decoration-color: var(--color-rule);
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .log {
+    white-space: pre-wrap;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-rule) transparent;
+  }
+  .log :global(.you) {
+    margin-top: 0.75rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.375rem;
+    background: rgb(255 255 255 / 0.07);
+    color: var(--color-paper);
+  }
+  .log :global(.you:first-child) {
+    margin-top: 0;
+  }
+  .log :global(.reply) {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.375rem;
+    color: var(--color-white);
+  }
+  .log :global(.sub) {
+    display: flex;
+    gap: 0.5rem;
+    padding-left: 0.125rem;
+    color: var(--color-mute);
+  }
+  .log :global(.sub span:first-child),
+  .log :global(.reply span:first-child) {
+    flex-shrink: 0;
+  }
+  .log :global(a) {
+    color: var(--color-white);
+    text-decoration: underline;
+    text-decoration-color: var(--color-rule);
+    text-underline-offset: 3px;
+  }
+  .log :global(a:hover) {
+    text-decoration-color: var(--color-white);
+  }
+  .menu :global([role="option"]) {
+    display: flex;
+    gap: 1rem;
+    padding: 0.25rem 1rem;
+    cursor: pointer;
+    color: var(--color-mute);
+  }
+  .menu :global([role="option"] b) {
+    width: 6rem;
+    flex-shrink: 0;
+    font-weight: 400;
+    color: var(--color-paper);
+  }
+  .menu :global([aria-selected="true"]),
+  .menu :global([aria-selected="true"] b) {
+    background: rgb(255 255 255 / 0.08);
+    color: var(--color-white);
+  }
+</style>
+
+<script>
+  import { contact, projects, tools } from "@/data/profile";
+
+  const root = document.querySelector<HTMLElement>("[data-term]")!;
+  const log = root.querySelector<HTMLElement>("[data-log]")!;
+  const form = root.querySelector<HTMLFormElement>("[data-form]")!;
+  const input = root.querySelector<HTMLInputElement>("[data-input]")!;
+  const menu = root.querySelector<HTMLUListElement>("[data-menu]")!;
+
+  const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+  const link = (href: string, label: string) =>
+    `<a href="${href}"${href.startsWith("http") ? ' target="_blank" rel="noopener noreferrer"' : ""}>${esc(label)}</a>`;
+  const reply = (html: string) => `<div class="reply"><span>⏺</span><span>${html}</span></div>`;
+  const sub = (html: string) => `<div class="sub"><span>⎿</span><span>${html}</span></div>`;
+
+  const github = contact.links.find((l) => l.label === "GitHub")!;
+
+  type Command = { name: string; about: string; run: (arg: string) => string | void };
+  const commands: Command[] = [
+    {
+      name: "/help",
+      about: "List commands",
+      run: () => reply("Commands") + commands.map((c) => sub(`<span class="text-white">${c.name}</span>  ${c.about}`)).join(""),
+    },
+    {
+      name: "/about",
+      about: "Who I am",
+      run: () =>
+        reply("Varith Pheng, software developer in Phnom Penh.") +
+        sub("Studying IT management at AUPP and computer science at Fort Hays State.") +
+        sub("I build web apps, APIs and payment checkouts."),
+    },
+    {
+      name: "/work",
+      about: "Projects I've built",
+      run: () =>
+        reply(`${projects.length} projects`) +
+        projects.map((p) => sub(`<span class="text-white">${esc(p.title)}</span>  ${p.year}, ${esc(p.kind)}`)).join("") +
+        sub(`Type <span class="text-white">/open baray</span> for details, or ${link("#work", "scroll to Work")}`),
+    },
+    {
+      name: "/open",
+      about: "Details on one project",
+      run: (arg) => {
+        const q = arg.toLowerCase();
+        const p = q && projects.find((p) => p.title.toLowerCase().includes(q));
+        if (!p) return reply(`Which one? Try ${projects.map((p) => `/open ${p.title.split(" ")[0].toLowerCase()}`).join(", ")}`);
+        return (
+          reply(`<span class="text-white">${esc(p.title)}</span>`) +
+          sub(esc(p.summary)) +
+          sub(`Built with ${esc(p.stack.join(", "))}`) +
+          sub(p.links.map((l) => link(l.href, l.label)).join("  "))
+        );
+      },
+    },
+    {
+      name: "/stack",
+      about: "Tools I use",
+      run: () => reply(`${tools.length} tools`) + sub(esc(tools.map((t) => t.name).join(", "))),
+    },
+    {
+      name: "/contact",
+      about: "How to reach me",
+      run: () =>
+        reply(link(`mailto:${contact.email}`, contact.email)) +
+        contact.links.map((l) => sub(`${esc(l.label)}  ${link(l.href, l.handle)}`)).join(""),
+    },
+    {
+      name: "/cv",
+      about: "Open my CV",
+      run: () => {
+        window.open("/assets/cv.pdf", "_blank", "noopener");
+        return reply(`Opening CV. ${link("/assets/cv.pdf", "Open it here")} if nothing happened.`);
+      },
+    },
+    { name: "/github", about: "My GitHub", run: () => reply(link(github.href, github.handle)) },
+    {
+      name: "/clear",
+      about: "Clear the screen",
+      run: () => {
+        log.innerHTML = "";
+      },
+    },
+  ];
+
+  // A few things people type out of habit.
+  const aliases: Record<string, string> = {
+    help: "/help", ls: "/work", whoami: "/about", projects: "/work", clear: "/clear", contact: "/contact", email: "/contact",
+  };
+
+  const history: string[] = [];
+  let historyAt = 0;
+
+  function execute(raw: string) {
+    const text = raw.trim();
+    if (!text) return;
+    history.push(text);
+    historyAt = history.length;
+
+    const [head, ...rest] = text.split(/\s+/);
+    const name = aliases[head.toLowerCase().replace(/^\//, "")] ?? head.toLowerCase();
+    const command = commands.find((c) => c.name === name);
+
+    if (name === "/clear") {
+      command!.run("");
+      return;
+    }
+    let out: string;
+    if (command) out = command.run(rest.join(" ")) ?? "";
+    else if (/^sudo\b/i.test(text)) out = reply(`Nice try. ${link(`mailto:${contact.email}`, "Email me")} instead.`);
+    else out = reply(`Unknown command: ${esc(head)}`) + sub(`Type <span class="text-white">/help</span> to see what's here.`);
+
+    log.insertAdjacentHTML("beforeend", `<div class="you">&gt; ${esc(text)}</div>${out}`);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  // Slash-command menu
+  let matches: Command[] = [];
+  let selected = 0;
+
+  function renderMenu() {
+    const v = input.value;
+    matches = v.startsWith("/") && !v.includes(" ") ? commands.filter((c) => c.name.startsWith(v.toLowerCase())) : [];
+    selected = Math.min(selected, Math.max(matches.length - 1, 0));
+    menu.innerHTML = matches
+      .map((c, i) => `<li role="option" id="term-opt-${i}" aria-selected="${i === selected}" data-name="${c.name}"><b>${c.name}</b>${c.about}</li>`)
+      .join("");
+    const open = matches.length > 0;
+    menu.classList.toggle("hidden", !open);
+    input.setAttribute("aria-expanded", String(open));
+    if (open) input.setAttribute("aria-activedescendant", `term-opt-${selected}`);
+    else input.removeAttribute("aria-activedescendant");
+  }
+
+  function complete(name: string) {
+    input.value = name === "/open" ? "/open " : name;
+    renderMenu();
+  }
+
+  input.addEventListener("input", () => {
+    selected = 0;
+    renderMenu();
+  });
+
+  input.addEventListener("keydown", (e) => {
+    const open = matches.length > 0;
+    if (open && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+      e.preventDefault();
+      selected = (selected + (e.key === "ArrowDown" ? 1 : -1) + matches.length) % matches.length;
+      renderMenu();
+    } else if (open && e.key === "Tab") {
+      e.preventDefault();
+      complete(matches[selected].name);
+    } else if (open && e.key === "Enter" && input.value !== matches[selected].name) {
+      // Enter on a partial command picks the highlighted one, as in Claude Code.
+      e.preventDefault();
+      const name = matches[selected].name;
+      if (name === "/open") return complete(name);
+      input.value = "";
+      renderMenu();
+      execute(name);
+    } else if (!open && (e.key === "ArrowUp" || e.key === "ArrowDown") && history.length) {
+      e.preventDefault();
+      historyAt = Math.max(0, Math.min(history.length, historyAt + (e.key === "ArrowUp" ? -1 : 1)));
+      input.value = history[historyAt] ?? "";
+    } else if (e.key === "Escape") {
+      input.value = "";
+      renderMenu();
+    }
+  });
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const v = input.value;
+    input.value = "";
+    renderMenu();
+    execute(v);
+  });
+
+  menu.addEventListener("mousedown", (e) => {
+    const name = (e.target as Element).closest<HTMLElement>("[data-name]")?.dataset.name;
+    if (!name) return;
+    e.preventDefault();
+    if (name === "/open") return complete(name);
+    input.value = "";
+    renderMenu();
+    execute(name);
+  });
+
+  // Start with one exchange on screen so the log shows what a reply looks like.
+  execute("/about");
+  history.length = 0;
+  historyAt = 0;
+
+  root.querySelector("[data-run]")?.addEventListener("click", (e) => {
+    execute((e.currentTarget as HTMLElement).dataset.run!);
+    input.focus({ preventScroll: true });
+  });
+
+  // Clicking anywhere on the terminal (but not on a link) focuses the prompt.
+  root.addEventListener("click", (e) => {
+    if (!(e.target as Element).closest("a, button, input") && !getSelection()?.toString()) input.focus({ preventScroll: true });
+  });
+
+</script>

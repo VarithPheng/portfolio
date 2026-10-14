@@ -1,24 +1,130 @@
 ---
 import { Icon } from "astro-icon/components";
-import { contact } from "@/data/profile";
+import { contact, findLogo, projects } from "@/data/profile";
+import Pane from "@/components/Pane.astro";
 
 const github = contact.links.find((l) => l.label === "GitHub")!;
 ---
 
-<section id="projects" class="shell">
-  <div class="grid gap-10 pt-12 lg:grid-cols-12 lg:pt-20">
-    <div class="lg:col-span-4">
-      <h2 class="heading">Projects</h2>
-    </div>
-
-    <div class="flex flex-col items-start gap-5 border-y border-white/10 py-6 lg:col-span-8 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
-      <p class="max-w-[44ch] text-lg text-paper">
-        Case studies are on the way. Until then, my code is on GitHub.
-      </p>
-      <a href={github.href} target="_blank" rel="noopener noreferrer" class="btn btn-line shrink-0">
-        <Icon name={github.icon} class="size-4" aria-hidden="true" />
-        View GitHub
-      </a>
-    </div>
+<Pane id="work" title="1:work" meta="coming soon" class="mt-20 lg:mt-28">
+  <div class="flex flex-col items-start gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+    <p class="max-w-[44ch] text-lg text-paper">Case studies are on the way. Until then, my code is on GitHub.</p>
+    <a href={github.href} target="_blank" rel="noopener noreferrer" class="btn btn-line shrink-0">
+      <Icon name={github.icon} class="size-4" aria-hidden="true" />
+      View GitHub
+    </a>
   </div>
-</section>
+
+  {/* Hidden for now. To show the projects again, uncomment this list and remove the placeholder above.
+  <ul class="-mt-5 lg:-mt-6">
+    {
+      projects.map((p, i) => (
+        <li class="border-b border-white/10 last:border-b-0">
+          <details class="project group" open={i === 0}>
+            <summary class="row -mx-4 grid cursor-pointer list-none grid-cols-[1fr_auto] items-end gap-x-4 gap-y-2 px-4 py-5 lg:-mx-8 lg:grid-cols-12 lg:gap-x-10 lg:px-8 lg:py-7">
+              <span class="meta mono col-span-2 text-mute lg:col-span-1 lg:self-center">{p.year}</span>
+              <span class="title display text-[12.5vw] text-white lg:col-span-8 lg:text-[clamp(4rem,6vw,6.5rem)]">{p.title}</span>
+              <span class="meta mono flex items-center justify-end gap-4 text-mute lg:col-span-3 lg:self-center">
+                <span class="hidden lg:inline">{p.kind.toLowerCase()}</span>
+                <span class="text-white" aria-hidden="true">
+                  <span class="group-open:hidden">[+]</span>
+                  <span class="hidden group-open:inline">[-]</span>
+                </span>
+              </span>
+            </summary>
+
+            <div class="grid gap-8 pb-10 lg:grid-cols-12 lg:gap-10 lg:pb-14">
+              <div class="lg:col-span-6 lg:col-start-2">
+                <p class="mono text-mute lg:hidden">{p.kind.toLowerCase()}</p>
+                <p class="mt-2 text-lg text-white lg:mt-0">{p.summary}</p>
+                <ul class="mt-6 space-y-3 text-paper">
+                  {p.details.map((d) => (
+                    <li class="flex gap-3">
+                      <span class="mt-[0.7em] h-px w-3 shrink-0 bg-mute" aria-hidden="true" />
+                      {d}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div class="flex flex-col gap-6 lg:col-span-4 lg:col-start-9">
+                <div>
+                  <h3 class="mono text-mute">built with</h3>
+                  <ul class="mt-3 flex flex-wrap gap-2">
+                    {p.stack.map((name) => {
+                      const logo = findLogo(name);
+                      return (
+                        <li class="glass inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm text-white">
+                          {logo && <Icon name={logo.icon} class="size-4" style={`color: ${logo.color}`} aria-hidden="true" />}
+                          {name}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                  {p.links.map((l, j) => {
+                    const external = l.href.startsWith("http");
+                    return (
+                      <a
+                        href={l.href}
+                        class:list={["btn", j === 0 ? "btn-solid" : "btn-line"]}
+                        {...(external && { target: "_blank", rel: "noopener noreferrer" })}
+                      >
+                        {l.label === "Source" && <Icon name="simple-icons:github" class="size-4" aria-hidden="true" />}
+                        {l.label}
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </details>
+        </li>
+      ))
+    }
+  </ul>
+  */}
+</Pane>
+
+<style>
+  /* Titles sit condensed and open up wider when a row is opened or pointed at. */
+  .title {
+    transition:
+      font-stretch 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
+      color 0.3s;
+  }
+  @media (min-width: 64rem) {
+    .project[open] .title {
+      font-stretch: 78%;
+    }
+  }
+  .project:not([open]) .title {
+    color: var(--color-mute);
+  }
+  /* Pointing at a row inverts it, like the cursor line in a TUI list. */
+  .row {
+    transition: background-color 0.2s;
+  }
+  @media (hover: hover) {
+    .row:hover {
+      background: var(--color-white);
+    }
+    .row:hover .title,
+    .row:hover .meta,
+    .row:hover .meta * {
+      color: var(--color-ink);
+    }
+  }
+  @media (hover: hover) and (min-width: 64rem) {
+    .row:hover .title {
+      font-stretch: 78%;
+    }
+  }
+  .project summary::-webkit-details-marker {
+    display: none;
+  }
+  .project summary:focus-visible {
+    outline-offset: -2px;
+  }
+</style>

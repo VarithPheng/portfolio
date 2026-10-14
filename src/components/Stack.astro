@@ -1,27 +1,36 @@
 ---
 import { Icon } from "astro-icon/components";
-import { toolGroups } from "@/data/profile";
+import { tools } from "@/data/profile";
+import Pane from "@/components/Pane.astro";
 ---
 
-<section id="stack" class="shell">
-  <div class="grid gap-10 pt-12 lg:grid-cols-12 lg:pt-20">
-    <div class="lg:col-span-4">
-      <h2 class="heading">Tech I use</h2>
-    </div>
+<Pane id="stack" title="2:stack" meta={`${tools.length} tools`} class="mt-16 lg:mt-24">
+  <ul class="grid grid-cols-2 gap-2 lg:grid-cols-4 lg:gap-3">
+    {
+      tools.map((t) => (
+        <li class="tile relative flex items-center gap-3 overflow-hidden rounded-lg border border-white/10 bg-white/[0.03] p-3.5 lg:block lg:p-5" style={`--brand: ${t.color}`}>
+          <Icon name={t.icon} class="relative size-7 shrink-0 lg:size-10" style={`color: ${t.color}`} aria-hidden="true" />
+          <div class="relative min-w-0 lg:mt-6">
+            <p class="text-sm text-white lg:text-base">{t.name}</p>
+            <p class="mono mt-1 hidden text-mute lg:block">{t.type.toLowerCase()}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</Pane>
 
-    <div class="divide-y divide-white/10 border-y border-white/10 lg:col-span-8">
-      {
-        toolGroups.map((g) => (
-          <ul class="flex flex-wrap gap-x-7 gap-y-3 py-5 text-lg text-paper">
-            {g.tools.map((t) => (
-              <li class="inline-flex items-center gap-2.5">
-                <Icon name={t.icon} class="size-5 shrink-0 text-mute" aria-hidden="true" />
-                {t.name}
-              </li>
-            ))}
-          </ul>
-        ))
-      }
-    </div>
-  </div>
-</section>
+<style>
+  /* Each tile catches a soft glow in its brand colour when pointed at. */
+  .tile::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(14rem 10rem at 0% 0%, color-mix(in srgb, var(--brand) 28%, transparent), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .tile:hover::before {
+    opacity: 1;
+  }
+</style>

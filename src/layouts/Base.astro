@@ -1,12 +1,14 @@
 ---
 import "@/styles/global.css";
 import archivo from "@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url";
+import martian from "@fontsource-variable/martian-mono/files/martian-mono-latin-wdth-normal.woff2?url";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 
 interface Props {
   title?: string;
   description?: string;
+  /** "home" brings its own rail and dock; "store" gets the shared header and footer. */
   nav?: "home" | "store";
   /** Keep the page out of search results (the store is reachable by URL only). */
   noindex?: boolean;
@@ -31,15 +33,16 @@ const {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <link rel="icon" href="/favicon.ico" />
-    <!-- Preloaded so the first paint already uses Archivo instead of reflowing from a fallback. -->
+    <!-- Preloaded so the first paint already uses the web fonts instead of reflowing from a fallback. -->
     <link rel="preload" href={archivo} as="font" type="font/woff2" crossorigin />
-    <style is:inline set:html={`@font-face{font-family:"Archivo Variable";font-style:normal;font-display:block;font-weight:100 900;font-stretch:62% 125%;src:url(${archivo}) format("woff2-variations");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}`} />
+    <link rel="preload" href={martian} as="font" type="font/woff2" crossorigin />
+    <style is:inline set:html={`@font-face{font-family:"Archivo Variable";font-style:normal;font-display:block;font-weight:100 900;font-stretch:62% 125%;src:url(${archivo}) format("woff2-variations");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}@font-face{font-family:"Martian Mono Variable";font-style:normal;font-display:block;font-weight:100 800;font-stretch:75% 112.5%;src:url(${martian}) format("woff2-variations");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}`} />
     <script is:inline>
-      // Hold the first paint until Archivo is ready so text never reflows (capped at 2.5s).
+      // Hold the first paint until both fonts are ready so text never reflows (capped at 2.5s).
       const root = document.documentElement;
       root.classList.add("js");
       Promise.race([
-        document.fonts.load('850 1em "Archivo Variable"'),
+        Promise.all([document.fonts.load('850 1em "Archivo Variable"'), document.fonts.load('400 1em "Martian Mono Variable"')]),
         new Promise((r) => setTimeout(r, 2500)),
       ]).finally(() => root.classList.add("fonts-ready"));
     </script>
@@ -48,10 +51,28 @@ const {
   </head>
   <body class="flex min-h-svh flex-col">
     <div class="backdrop" aria-hidden="true"></div>
-    <Header nav={nav} />
+    {nav === "store" && <Header />}
     <main class="flex-1">
       <slot />
     </main>
-    <Footer />
+    {nav === "store" && <Footer />}
+
+    <script>
+      // Scroll to in-page sections without putting "#section" in the address bar.
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      document.addEventListener("click", (event) => {
+        if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const link = (event.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');
+        const target = link && document.getElementById(link.hash.slice(1));
+        if (!target) return;
+
+        event.preventDefault();
+        target.scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth" });
+        // Move keyboard focus to the section too, as a normal anchor jump would.
+        if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
+        target.focus({ preventScroll: true });
+      });
+    </script>
   </body>
 </html>

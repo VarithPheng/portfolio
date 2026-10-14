@@ -1,18 +1,20 @@
 ---
 import Base from "@/layouts/Base.astro";
+import StatusBar from "@/components/StatusBar.astro";
 import Hero from "@/components/Hero.astro";
-import StackMarquee from "@/components/StackMarquee.astro";
 import Projects from "@/components/Projects.astro";
-import Education from "@/components/Education.astro";
 import Stack from "@/components/Stack.astro";
+import About from "@/components/About.astro";
 import Contact from "@/components/Contact.astro";
 ---
 
 <Base>
-  <Hero />
-  <StackMarquee />
-  <Education />
-  <Stack />
-  <Projects />
-  <Contact />
+  <div class="shell">
+    <Hero />
+    <Projects />
+    <Stack />
+    <About />
+    <Contact />
+  </div>
+  <StatusBar />
 </Base>

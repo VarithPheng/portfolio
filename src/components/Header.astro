@@ -1,13 +1,8 @@
 ---
 import CartCount from "./CartCount.astro";
 
-interface Props {
-  nav: "home" | "store";
-}
-
-const { nav } = Astro.props;
-const onHome = Astro.url.pathname === "/";
-const section = (id: string) => (onHome ? `#${id}` : `/#${id}`);
+const path = Astro.url.pathname;
+const item = "block rounded-full px-3 py-2 transition-colors hover:bg-white/10 hover:text-white lg:px-4";
 ---
 
 <header class="shell sticky top-3 z-40 mt-3">
@@ -15,62 +10,12 @@ const section = (id: string) => (onHome ? `#${id}` : `/#${id}`);
     <a href="/" class="display text-xl text-white">Varith Pheng</a>
 
     <ul class="flex items-center gap-1 text-sm text-mute">
-      {
-        nav === "home" ? (
-          <>
-            <li class="hidden lg:block">
-              <a class="block rounded-full px-3 py-2 transition-colors hover:bg-white/10 hover:text-white lg:px-4" href={section("education")}>Education</a>
-            </li>
-            <li class="hidden lg:block">
-              <a class="block rounded-full px-3 py-2 transition-colors hover:bg-white/10 hover:text-white lg:px-4" href={section("stack")}>Tech</a>
-            </li>
-            <li class="hidden lg:block">
-              <a class="block rounded-full px-3 py-2 transition-colors hover:bg-white/10 hover:text-white lg:px-4" href={section("projects")}>Projects</a>
-            </li>
-            <li>
-              <a class="block rounded-full px-3 py-2 transition-colors hover:bg-white/10 hover:text-white lg:px-4" href={section("contact")}>Contact</a>
-            </li>
-          </>
-        ) : (
-          <>
-            <li>
-              <a
-                class:list={["block rounded-full px-3 py-2 transition-colors hover:bg-white/10 hover:text-white lg:px-4", Astro.url.pathname === "/store" && "bg-white/10 text-white"]}
-                href="/store"
-              >
-                Store
-              </a>
-            </li>
-            <li>
-              <a
-                class:list={["block rounded-full px-3 py-2 transition-colors hover:bg-white/10 hover:text-white lg:px-4", Astro.url.pathname === "/cart" && "bg-white/10 text-white"]}
-                href="/cart"
-              >
-                Cart <CartCount />
-              </a>
-            </li>
-          </>
-        )
-      }
+      <li>
+        <a class:list={[item, path === "/store" && "bg-white/10 text-white"]} href="/store">Store</a>
+      </li>
+      <li>
+        <a class:list={[item, path === "/cart" && "bg-white/10 text-white"]} href="/cart">Cart <CartCount /></a>
+      </li>
     </ul>
   </nav>
 </header>
-
-
-<script>
-  // Scroll to in-page sections without putting "#section" in the address bar.
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-
-  document.addEventListener("click", (event) => {
-    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-    const link = (event.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');
-    const target = link && document.getElementById(link.hash.slice(1));
-    if (!target) return;
-
-    event.preventDefault();
-    target.scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth" });
-    // Move keyboard focus to the section too, as a normal anchor jump would.
-    if (!target.hasAttribute("tabindex")) target.setAttribute("tabindex", "-1");
-    target.focus({ preventScroll: true });
-  });
-</script>

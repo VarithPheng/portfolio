@@ -1,0 +1,29 @@
+---
+// A TUI-style pane: a ruled box with its title cut into the top border, like lazygit or htop.
+interface Props {
+  title: string;
+  /** Optional text cut into the top border on the right. */
+  meta?: string;
+  id?: string;
+  /** "h2" for page sections; "p" for panes that sit inside another section. */
+  as?: "h2" | "p";
+  class?: string;
+}
+
+const { title, meta, id, as: Title = "h2", class: className } = Astro.props;
+const edge = "h-3 self-end border-t border-white/20";
+const Root = id ? "section" : "div";
+---
+
+<Root id={id} class:list={["scroll-mt-8", className]}>
+  <div class="mono flex items-center">
+    <span class:list={[edge, "w-4 rounded-tl-xl border-l lg:w-6"]}></span>
+    <Title class="px-2 text-white">{title}</Title>
+    <span class:list={[edge, "flex-1"]}></span>
+    {meta && <span class="px-2 text-mute">{meta}</span>}
+    <span class:list={[edge, "w-4 rounded-tr-xl border-r lg:w-6"]}></span>
+  </div>
+  <div class="rounded-b-xl border-x border-b border-white/20 px-4 pt-5 pb-6 lg:px-8 lg:pt-6 lg:pb-8">
+    <slot />
+  </div>
+</Root>

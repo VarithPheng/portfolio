@@ -1,17 +1,18 @@
 ---
 import { Icon } from "astro-icon/components";
 import { contact } from "@/data/profile";
+import Pane from "@/components/Pane.astro";
 ---
 
-<section id="contact" class="shell">
-  <div class="py-12 lg:py-20">
-    <h2 class="heading">Contact</h2>
-    <p class="mt-4 max-w-[40ch] text-mute">
-      Have a project, a role or a question? Send me an email.
+<Pane id="contact" title="4:contact" class="mt-16 lg:mt-24">
+  <div>
+    <p class="max-w-[40ch] text-mute">
+      Hiring, or have a project in mind? Email is the fastest way to reach me.
     </p>
 
     <a
-      class="display mt-8 block text-[12.5vw] text-white transition-colors hover:text-paper lg:text-[5rem]"
+      href={`mailto:${contact.email}`}
+      class="display mt-8 block text-[12.5vw] text-white transition-colors hover:text-paper lg:text-[clamp(4rem,6vw,6rem)]"
     >
       {contact.email}
     </a>
@@ -32,7 +33,7 @@ import { contact } from "@/data/profile";
       <span data-copy-label>Copy email</span>
     </button>
 
-    <ul class="mt-16 grid gap-3 lg:grid-cols-3">
+    <ul class="mt-10 grid gap-3 lg:grid-cols-3">
       {
         contact.links.map((l) => (
           <li>
@@ -40,10 +41,10 @@ import { contact } from "@/data/profile";
               href={l.href}
               target="_blank"
               rel="noopener noreferrer"
-              class="glass flex h-full flex-col gap-1 rounded-2xl p-5 transition-colors hover:bg-white/10"
+              class="flex h-full flex-col gap-1 rounded-lg border border-white/10 bg-white/[0.03] p-4 transition-colors hover:border-white/30 hover:bg-white/[0.07]"
             >
-              <span class="inline-flex items-center gap-2 text-sm text-mute">
-                <Icon name={l.icon} class="size-4" aria-hidden="true" />{" "}
+              <span class="mono inline-flex items-center gap-2 text-mute">
+                <Icon name={l.icon} class="size-4" style={`color: ${l.color}`} aria-hidden="true" />{" "}
                 {l.label}
               </span>
               <span class="text-white">{l.handle}</span>
@@ -52,8 +53,11 @@ import { contact } from "@/data/profile";
         ))
       }
     </ul>
+
   </div>
-</section>
+</Pane>
+
+<p class="mono mt-6 pb-24 text-mute">© {new Date().getFullYear()} Varith Pheng. Built with Astro.</p>
 
 <script>
   const btn = document.querySelector<HTMLButtonElement>("[data-copy]");
