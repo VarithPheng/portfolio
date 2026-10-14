@@ -5,11 +5,17 @@ import Pane from "@/components/Pane.astro";
 ---
 
 <Pane id="about" title="3:about" meta="education" class="mt-16 lg:mt-24">
-  <ul class="flex flex-wrap gap-3 lg:gap-4">
+  <ul class="grid gap-3 lg:grid-cols-2 lg:gap-4">
     {
       education.map((e) => (
-        <li class="rounded-xl bg-white px-4 py-3 lg:px-5 lg:py-4">
-          <Image src={e.logo} alt={e.school} height={96} densities={[1, 2]} class="h-10 w-auto lg:h-12" />
+        <li class="flex items-center justify-center rounded-xl bg-white px-5 py-4 lg:py-5">
+          <Image
+            src={e.logo}
+            alt={e.school}
+            height={112}
+            densities={[1, 2]}
+            class="h-9 w-auto max-w-full lg:h-12"
+          />
         </li>
       ))
     }
