@@ -1,19 +1,11 @@
 ---
 import { Icon } from "astro-icon/components";
-import { contact, findLogo, projects } from "@/data/profile";
+import { findLogo, projects } from "@/data/profile";
 import Pane from "@/components/Pane.astro";
-
-const github = contact.links.find((l) => l.label === "GitHub")!;
 ---
 
-<Pane id="work" title="1:work" meta="coming soon" class="mt-20 lg:mt-28">
-  <div class="flex flex-col items-start gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
-    <p class="max-w-[44ch] text-lg text-paper">Case studies are on the way. Until then, my code is on GitHub.</p>
-    <a href={github.href} target="_blank" rel="noopener noreferrer" class="btn btn-line shrink-0">
-      <Icon name={github.icon} class="size-4" aria-hidden="true" />
-      View GitHub
-    </a>
-  </div>
+<Pane id="work" title="1:work" class="mt-20 lg:mt-28">
+  <p class="text-lg text-paper">Coming soon.</p>
 
   {/* Hidden for now. To show the projects again, uncomment this list and remove the placeholder above.
   <ul class="-mt-5 lg:-mt-6">
